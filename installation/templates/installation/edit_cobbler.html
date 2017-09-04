@@ -1,0 +1,51 @@
+{% extends "installation/system/add_system.html" %}
+
+{% block content %}
+      {% if messages %}
+              {% for message in messages %}
+                  {% if message.tags == 'error' %}
+                      <p class="alert alert-block alert-danger fade in">{{ message }}</p>
+                  {% else %}
+                      <p class="alert alert-success fade in">{{ message }}</p>
+                  {% endif %}   
+              {% endfor %}
+      {% endif %} 
+    <form class="form-horizontal" role="form" action="{% url 'installation:edit_cobbler' cobbler.id %}" method="post" role="form">
+        {% csrf_token %}
+          <div class="form-group">
+            <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">IP 地址 *</span></label>
+            <div class="col-xs-8 col-md-6 col-sm-6" >
+                  <input class="form-control" name="ip" required="required" type="text" value="{{cobbler.ip}}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">服务端口 *</span></label>
+            <div class="col-xs-8 col-md-6 col-sm-6" >
+                  <input class="form-control" name="port" required="required" type="text" value="{{cobbler.port}}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span>User *</span></label>
+            <div class="col-xs-8 col-md-6 col-sm-6">
+                <input class="form-control" name="user" required="required" type="text" value="{{cobbler.user}}">
+            </div>
+          </div>
+
+
+          <div class="form-group" >
+            <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">Password *</span></label>
+            <div class="col-xs-8 col-md-6 col-sm-6" >
+              <input class="form-control" name="password" required="required" type="password" value="{{cobbler.password}}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-xs-8 col-md-6 col-sm-6">
+              <button type="submit" class="btn">Submit</button>
+            </div>
+          </div>
+        </form>
+{% endblock %}
+

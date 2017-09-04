@@ -1,0 +1,63 @@
+{% extends "installation/system/add_system.html" %}
+
+    {% block content %}
+      <form class="form-horizontal" role="form" action="{% url 'installation:edit_system' server.id pre_system.name %}" method="post" role="form">
+          {% csrf_token %}     
+        <div class="form-group">
+          <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span>Hostname *</span></label>
+          <div class="col-xs-8 col-md-6 col-sm-6">
+              <input class="form-control" name="hostname" required="required" type="text" value="{{pre_system.hostname}}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">IP 地址 *</span></label>
+          <div class="col-xs-8 col-md-6 col-sm-6" >
+                <input class="form-control" name="ip_addr" required="required" type="text" value="{{pre_system.ip}}">
+          </div>
+        </div>
+
+            <div class="form-group" >
+              <label class="col-md-3 col-sm-3 col-xs-3 control-label">Mac 地址<span class="required">*</span></label>
+              <div class="col-xs-8 col-md-6 col-sm-6" >
+              <input class="form-control" name="mac_addr" required="required" type="text" value="{{pre_system.mac}}" readonly="readonly">
+                <!-- <select class="form-control m-bot15" name="mac_addr">
+                  {% for nic in server.nic_set.all %}
+                    {% if nic.mac == pre_system.mac %}
+                      <option value="{{nic.name}}:{{nic.mac}}" selected>{{nic.name}}: {{nic.mac}}</option>
+                    {% else %}
+                      <option value="{{nic.name}}/{{nic.mac}}">{{nic.name}}: {{nic.mac}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select> -->
+              </div>
+            </div>
+
+            <div class="form-group" >
+              <label class="col-md-3 col-sm-3 col-xs-3 control-label">Profile<span class="required">*</span></label>
+              <div class="col-xs-8 col-md-6 col-sm-6" >
+                <select class="form-control" name="profile" required="required">
+                      {% for profile in profiles %}
+                        {% if profile == pre_system.profile %}
+                          <option value="{{profile}}" selected>{{profile}}</option>
+                        {% else%}
+                          <option value="{{profile}}">{{profile}}</option>
+                        {% endif %}
+                      {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" >
+              <label class="col-md-3 col-sm-3 col-xs-3 control-label">Kopts</label>
+              <div class="col-xs-8 col-md-6 col-sm-6">
+                       <textarea class="form-control" name="kopts" data-parsley-trigger="keyup" data-parsley-minlength="20" data-parsley-maxlength="100"  data-parsley-validation-threshold="10"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-8 col-md-6 col-sm-6">
+                <button type="submit" class="btn">提交</button>
+              </div>
+            </div>
+          </form>
+    {% endblock %}

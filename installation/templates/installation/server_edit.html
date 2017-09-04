@@ -1,0 +1,118 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"  charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <br>
+    <form class="form-horizontal" action="{% url 'installation:server_edit' server.id %}" method="post">
+          {% csrf_token %}
+            <div class="form-group" >
+              <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">机房</label>
+              <div class="col-md-3 col-sm-4 col-xs-6" >
+                <select class="form-control" id="idc">
+                  <option value="{{server.cabinet.idc.id}}">{{server.cabinet.idc.name}}</option>
+                  {% for idc in idcs %}
+                  <option value="{{idc.id}}">{{idc.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group" >
+              <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">机柜</label>
+              <div class="col-md-3 col-sm-4 col-xs-6">
+                <select class="form-control" name="cabinet_id" id="cabinet">
+                 <option value="{{server.cabinet.id}}">{{server.cabinet.name}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" >
+              <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">位置(U)</label>
+              <div class="col-md-3 col-sm-4 col-xs-6">
+                <select class="form-control" name="unit">
+                <option value="{{server.unit}}">{{server.unit}}</option>
+                  {% for i in location %}
+                    <option value="{{i}}">{{i}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group" >
+              <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">环境</label>
+              <div class="col-md-3 col-sm-4 col-xs-6">
+                <select class="form-control" name="environment_id">
+                  <option value="{{server.environment.id}}">{{server.environment.name}}</option>
+                  {% for env in environments %}
+                  <option value="{{env.id}}">{{env.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group" >
+              <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">联系人</label>
+              <div class="col-md-3 col-sm-4 col-xs-6">
+                <select class="form-control" name="contacter_id">
+                  <option value="{{server.contacter.id}}">{{server.contacter.name}}</option>
+                  {% for contacter in contacters %}
+                  <option value="{{contacter.id}}">{{contacter.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="ln_solid"></div>
+            <div class="form-group">
+              <div class="col-md-6 col-sm-6 col-xs-12" style="padding-left: 160px;">
+                <button type="submit" class="btn">Submit</button>
+              </div>
+            </div>
+    </form>
+
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script type="text/javascript">
+      $(function(){
+        $("#idc").change(function(){
+          var idcid=$("#idc").val();
+          $("#cabinet").empty();
+          if(idcid!="-1"){
+            $.ajax({
+              type:"GET",
+                url:'/installation/select_cab/',
+               
+               data:"idc_id="+idcid,
+                
+                dataType:"Text",
+                async : false, 
+                success:function(result){
+                   
+                   result = $.parseJSON(result);
+                   $.each(result,function(index,value)
+                          {
+                            $("#cabinet").append("<option value = '" + index  + "'>" + value + "</option>");
+                          }
+                   );
+
+                  }
+       
+            });
+          }
+         
+        });
+
+        $("#cabinet").click(function(){
+        var roomnumber=$("#room").val();
+        if(roomnumber=="-1"){
+          alert("请先选择机房！");
+        }
+        });
+        });
+    </script>
+  <body>

@@ -1,0 +1,170 @@
+17:53:13 Registering birth of worker devops.17760
+17:53:13 RQ worker u'rq:worker:devops.17760' started, version 0.8.1
+17:53:13 Cleaning registries for queue: high
+17:53:13 Cleaning registries for queue: default
+17:53:13 Cleaning registries for queue: low
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (81dfc72d-fb40-4e6e-b8ae-b93b45c4afcd)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (81dfc72d-fb40-4e6e-b8ae-b93b45c4afcd)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (a2c8a730-9a6d-4fe8-a132-9afda5e2ee50)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (a2c8a730-9a6d-4fe8-a132-9afda5e2ee50)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (b40a2245-aa23-4445-8ab2-e881441144cb)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (b40a2245-aa23-4445-8ab2-e881441144cb)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (2bfa9ec4-5001-48e2-95ba-ebe47378116d)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (2bfa9ec4-5001-48e2-95ba-ebe47378116d)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (1b4ecc48-8a77-452a-bc27-a8c978f2088a)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (1b4ecc48-8a77-452a-bc27-a8c978f2088a)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (6ab1b7d4-99d6-4e86-9e13-1a9690c7871b)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (6ab1b7d4-99d6-4e86-9e13-1a9690c7871b)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (6d624b01-20f2-4c49-8ce0-e14c39dbabaa)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (6d624b01-20f2-4c49-8ce0-e14c39dbabaa)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (a4803baa-3395-4df6-abed-a9472db5a910)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (a4803baa-3395-4df6-abed-a9472db5a910)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (ba765526-b961-4665-b6a1-f980feac8047)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (ba765526-b961-4665-b6a1-f980feac8047)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (f36a4d7c-a6a0-4134-9d0f-f381534cfac8)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (f36a4d7c-a6a0-4134-9d0f-f381534cfac8)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/event/exit', 'data': {}}) (7e596d7f-04c0-409b-bfcd-206bbd301924)
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 high: Job OK (7e596d7f-04c0-409b-bfcd-206bbd301924)
+17:53:13 Result is kept for 500 seconds
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:53:13 
+17:53:13 *** Listening on high, default, low...
+17:53:13 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:48 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/auth', 'data': {'_stamp': '2017-09-04T09:54:48.504646', 'act': 'accept', 'id': 'cobbler', 'pub': '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzRy9UBh0QOsEco+M/d7H\nxQSQK9IBc4nvMb1Pd6W9KwcWBfuwxRmH3JhDEs2p0o9SY9W1GEhkGs3mMXqt4LIe\nwSi+OeK5swmMmr3gdodocQR5ELUoVs9iC+yWgWSWYkTkVs3ZxhAWT8ugtzTBqoCV\nMyTYn+9G7Tmt/VsrwqEXziGbvyr6Ie2RcrpdiNxZs9ew/nbbzT8VLyxHk+ss2Ocq\nQph7udv+TQn0/Uwq2x5p3v3hhOvHY+Y0CwesGr5yOq8Jt5XUKoogn6sfhuBRQWGd\n3XzrotjO0mL3lHOtXaOlKjPUyrnc+zdGYURf5YiFgqb/YyrkIiW6h2NQj61pHaiQ\n1wIDAQAB\n-----END PUBLIC KEY-----', 'result': True}}) (b502f853-41e8-43ff-831b-7321b094844c)
+17:54:48 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:48 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:48 high: Job OK (b502f853-41e8-43ff-831b-7321b094844c)
+17:54:48 Result is kept for 500 seconds
+17:54:48 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:48 
+17:54:48 *** Listening on high, default, low...
+17:54:48 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:52 high: script_on_saltmaster.parse_salt_event({'tag': 'minion_start', 'data': {'_stamp': '2017-09-04T09:54:52.879476', 'pretag': None, 'cmd': '_minion_event', 'tag': 'minion_start', 'data': 'Minion cobbler started at Mon Sep  4 16:54:53 2017', 'id': 'cobbler'}}) (9a42d640-44c0-4053-a293-fee54420dc3d)
+17:54:52 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:52 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:52 high: Job OK (9a42d640-44c0-4053-a293-fee54420dc3d)
+17:54:52 Result is kept for 500 seconds
+17:54:52 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:52 
+17:54:52 *** Listening on high, default, low...
+17:54:52 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:52 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/minion/cobbler/start', 'data': {'_stamp': '2017-09-04T09:54:52.886478', 'pretag': None, 'cmd': '_minion_event', 'tag': 'salt/minion/cobbler/start', 'data': 'Minion cobbler started at Mon Sep  4 16:54:53 2017', 'id': 'cobbler'}}) (1c40742c-e1a1-425b-914f-c76a03a9f306)
+17:54:52 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:52 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: Job OK (1c40742c-e1a1-425b-914f-c76a03a9f306)
+17:54:53 Result is kept for 500 seconds
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 
+17:54:53 *** Listening on high, default, low...
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: script_on_saltmaster.parse_salt_event({'tag': '20170904175452972545', 'data': {'_stamp': '2017-09-04T09:54:52.972876', 'minions': ['cobbler']}}) (4d9fb386-0e9a-41bf-99cc-19ec1f2a064e)
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: Job OK (4d9fb386-0e9a-41bf-99cc-19ec1f2a064e)
+17:54:53 Result is kept for 500 seconds
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 
+17:54:53 *** Listening on high, default, low...
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170904175452972545/new', 'data': {'tgt_type': 'glob', 'jid': '20170904175452972545', 'tgt': 'cobbler', '_stamp': '2017-09-04T09:54:52.973156', 'user': 'root', 'arg': [], 'fun': 'grains.items', 'minions': ['cobbler']}}) (36d7bb60-4590-4f69-b606-c0e681e0e4d7)
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: Job OK (36d7bb60-4590-4f69-b606-c0e681e0e4d7)
+17:54:53 Result is kept for 500 seconds
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 
+17:54:53 *** Listening on high, default, low...
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170904175452972545/ret/cobbler', 'data': {'fun_args': [], 'jid': '20170904175452972545', 'return': {'biosversion': '6.00', 'kernel': 'Linux', 'domain': '', 'uid': 0, 'zmqversion': '4.0.5', 'kernelrelease': '2.6.32-431.el6.x86_64', 'selinux': {'enforced': 'Disabled', 'enabled': False}, 'serialnumber': 'VMware-56 4d 02 27 06 20 e5 87-4c 9a 9d 3b e9 c3 16 2d', 'HBA': {}, 'ip_interfaces': {'lo': ['127.0.0.1', '::1'], 'eth0': ['192.168.3.166', 'fe80::20c:29ff:fec3:162d']}, 'groupname': 'root', 'fqdn_ip6': [], 'mem_total': 1877, 'saltversioninfo': [2016, 11, 6, 0], 'SSDs': ['sda', 'dm-0', 'dm-1'], 'mdadm': [], 'id': 'cobbler', 'nodename': 'cobbler', 'osrelease': '6.5', 'ps': 'ps -efH', 'server_id': 1771071380, 'fqdn': 'cobbler', 'uuid': '27024d56-2006-87e5-4c9a-9d3be9c3162d', 'ip6_interfaces': {'lo': ['::1'], 'eth0': ['fe80::20c:29ff:fec3:162d']}, 'num_cpus': 1, 'saltversion': '2016.11.6', 'hwaddr_interfaces': {'lo': '00:00:00:00:00:00', 'eth0': '00:0c:29:c3:16:2d'}, 'osfullname': 'CentOS', 'ip4_interfaces': {'lo': ['127.0.0.1'], 'eth0': ['192.168.3.166']}, 'init': 'upstart', 'gid': 0, 'master': '192.168.3.169', 'ipv4': ['127.0.0.1', '192.168.3.166'], 'dns': {'domain': '', 'sortlist': [], 'nameservers': ['192.168.3.1'], 'ip4_nameservers': ['192.168.3.1'], 'search': [], 'ip6_nameservers': [], 'options': []}, 'ipv6': ['::1', 'fe80::20c:29ff:fec3:162d'], 'cpu_flags': ['fpu', 'vme', 'de', 'pse', 'tsc', 'msr', 'pae', 'mce', 'cx8', 'apic', 'sep', 'mtrr', 'pge', 'mca', 'cmov', 'pat', 'pse36', 'clflush', 'dts', 'mmx', 'fxsr', 'sse', 'sse2', 'ss', 'syscall', 'nx', 'pdpe1gb', 'rdtscp', 'lm', 'constant_tsc', 'up', 'arch_perfmon', 'pebs', 'bts', 'xtopology', 'tsc_reliable', 'nonstop_tsc', 'aperfmperf', 'unfair_spinlock', 'pni', 'pclmulqdq', 'ssse3', 'fma', 'cx16', 'pcid', 'sse4_1', 'sse4_2', 'x2apic', 'movbe', 'popcnt', 'tsc_deadline_timer', 'aes', 'xsave', 'avx', 'f16c', 'rdrand', 'hypervisor', 'lahf_lm', 'abm', '3dnowprefetch', 'ida', 'arat', 'epb', 'xsaveopt', 'pln', 'pts', 'dts', 'fsgsbase', 'bmi1', 'hle', 'avx2', 'smep', 'bmi2', 'invpcid', 'rtm'], 'localhost': 'cobbler', 'lsb_distrib_id': 'CentOS', 'username': 'root', 'fqdn_ip4': ['192.168.3.166'], 'shell': '/bin/sh', 'users': [{'shell': '/bin/bash', 'uid': 0, 'passwd': 'x', 'gid': 0, 'groups': ['root'], 'home': '/root', 'fullname': 'root', 'lastlogin': 'pts/1 192.168.3.190 Mon Sep 4 15:54:59 +0800 2017', 'name': 'root'}, {'shell': '/sbin/nologin', 'uid': 1, 'passwd': 'x', 'gid': 1, 'groups': ['bin', 'daemon', 'sys'], 'home': '/bin', 'fullname': 'bin', 'lastlogin': '**Never logged in**', 'name': 'bin'}, {'shell': '/sbin/nologin', 'uid': 2, 'passwd': 'x', 'gid': 2, 'groups': ['adm', 'bin', 'daemon', 'lp'], 'home': '/sbin', 'fullname': 'daemon', 'lastlogin': '**Never logged in**', 'name': 'daemon'}, {'shell': '/sbin/nologin', 'uid': 3, 'passwd': 'x', 'gid': 4, 'groups': ['adm', 'sys'], 'home': '/var/adm', 'fullname': 'adm', 'lastlogin': '**Never logged in**', 'name': 'adm'}, {'shell': '/sbin/nologin', 'uid': 4, 'passwd': 'x', 'gid': 7, 'groups': ['lp'], 'home': '/var/spool/lpd', 'fullname': 'lp', 'lastlogin': '**Never logged in**', 'name': 'lp'}, {'shell': '/bin/sync', 'uid': 5, 'passwd': 'x', 'gid': 0, 'groups': ['root'], 'home': '/sbin', 'fullname': 'sync', 'lastlogin': '**Never logged in**', 'name': 'sync'}, {'shell': '/sbin/shutdown', 'uid': 6, 'passwd': 'x', 'gid': 0, 'groups': ['root'], 'home': '/sbin', 'fullname': 'shutdown', 'lastlogin': '**Never logged in**', 'name': 'shutdown'}, {'shell': '/sbin/halt', 'uid': 7, 'passwd': 'x', 'gid': 0, 'groups': ['root'], 'home': '/sbin', 'fullname': 'halt', 'lastlogin': '**Never logged in**', 'name': 'halt'}, {'shell': '/sbin/nologin', 'uid': 8, 'passwd': 'x', 'gid': 12, 'groups': ['mail'], 'home': '/var/spool/mail', 'fullname': 'mail', 'lastlogin': '**Never logged in**', 'name': 'mail'}, {'shell': '/sbin/nologin', 'uid': 10, 'passwd': 'x', 'gid': 14, 'groups': ['uucp'], 'home': '/var/spool/uucp', 'fullname': 'uucp', 'lastlogin': '**Never logged in**', 'name': 'uucp'}, {'shell': '/sbin/nologin', 'uid': 11, 'passwd': 'x', 'gid': 0, 'groups': ['root'], 'home': '/root', 'fullname': 'operator', 'lastlogin': '**Never logged in**', 'name': 'operator'}, {'shell': '/sbin/nologin', 'uid': 12, 'passwd': 'x', 'gid': 100, 'groups': ['users'], 'home': '/usr/games', 'fullname': 'games', 'lastlogin': '**Never logged in**', 'name': 'games'}, {'shell': '/sbin/nologin', 'uid': 13, 'passwd': 'x', 'gid': 30, 'groups': ['gopher'], 'home': '/var/gopher', 'fullname': 'gopher', 'lastlogin': '**Never logged in**', 'name': 'gopher'}, {'shell': '/sbin/nologin', 'uid': 14, 'passwd': 'x', 'gid': 50, 'groups': ['ftp'], 'home': '/var/ftp', 'fullname': 'FTP User', 'lastlogin': '**Never logged in**', 'name': 'ftp'}, {'shell': '/sbin/nologin', 'uid': 99, 'passwd': 'x', 'gid': 99, 'groups': ['nobody'], 'home': '/', 'fullname': 'Nobody', 'lastlogin': '**Never logged in**', 'name': 'nobody'}, {'shell': '/sbin/nologin', 'uid': 81, 'passwd': 'x', 'gid': 81, 'groups': ['dbus'], 'home': '/', 'fullname': 'System message bus', 'lastlogin': '**Never logged in**', 'name': 'dbus'}, {'shell': '/sbin/nologin', 'uid': 69, 'passwd': 'x', 'gid': 69, 'groups': ['vcsa'], 'home': '/dev', 'fullname': 'virtual console memory owner', 'lastlogin': '**Never logged in**', 'name': 'vcsa'}, {'shell': '/sbin/nologin', 'uid': 32, 'passwd': 'x', 'gid': 32, 'groups': ['rpc'], 'home': '/var/cache/rpcbind', 'fullname': 'Rpcbind Daemon', 'lastlogin': '**Never logged in**', 'name': 'rpc'}, {'shell': '/sbin/nologin', 'uid': 173, 'passwd': 'x', 'gid': 173, 'groups': ['abrt'], 'home': '/etc/abrt', 'fullname': '', 'lastlogin': '**Never logged in**', 'name': 'abrt'}, {'shell': '/sbin/nologin', 'uid': 29, 'passwd': 'x', 'gid': 29, 'groups': ['rpcuser'], 'home': '/var/lib/nfs', 'fullname': 'RPC Service User', 'lastlogin': '**Never logged in**', 'name': 'rpcuser'}, {'shell': '/sbin/nologin', 'uid': 65534, 'passwd': 'x', 'gid': 65534, 'groups': ['nfsnobody'], 'home': '/var/lib/nfs', 'fullname': 'Anonymous NFS User', 'lastlogin': '**Never logged in**', 'name': 'nfsnobody'}, {'shell': '/sbin/nologin', 'uid': 68, 'passwd': 'x', 'gid': 68, 'groups': ['haldaemon'], 'home': '/', 'fullname': 'HAL daemon', 'lastlogin': '**Never logged in**', 'name': 'haldaemon'}, {'shell': '/sbin/nologin', 'uid': 38, 'passwd': 'x', 'gid': 38, 'groups': ['ntp'], 'home': '/etc/ntp', 'fullname': '', 'lastlogin': '**Never logged in**', 'name': 'ntp'}, {'shell': '/sbin/nologin', 'uid': 499, 'passwd': 'x', 'gid': 76, 'groups': ['saslauth'], 'home': '/var/empty/saslauth', 'fullname': '"Saslauthd user"', 'lastlogin': '**Never logged in**', 'name': 'saslauth'}, {'shell': '/sbin/nologin', 'uid': 89, 'passwd': 'x', 'gid': 89, 'groups': ['mail', 'postfix'], 'home': '/var/spool/postfix', 'fullname': '', 'lastlogin': '**Never logged in**', 'name': 'postfix'}, {'shell': '/sbin/nologin', 'uid': 74, 'passwd': 'x', 'gid': 74, 'groups': ['sshd'], 'home': '/var/empty/sshd', 'fullname': 'Privilege-separated SSH', 'lastlogin': '**Never logged in**', 'name': 'sshd'}, {'shell': '/sbin/nologin', 'uid': 72, 'passwd': 'x', 'gid': 72, 'groups': ['tcpdump'], 'home': '/', 'fullname': '', 'lastlogin': '**Never logged in**', 'name': 'tcpdump'}, {'shell': '/sbin/nologin', 'uid': 16, 'passwd': 'x', 'gid': 16, 'groups': ['oprofile'], 'home': '/home/oprofile', 'fullname': 'Special user account to be used by OProfile', 'lastlogin': '**Never logged in**', 'name': 'oprofile'}, {'shell': '/sbin/nologin', 'uid': 48, 'passwd': 'x', 'gid': 48, 'groups': ['apache'], 'home': '/var/www', 'fullname': 'Apache', 'lastlogin': '**Never logged in**', 'name': 'apache'}, {'shell': '/sbin/nologin', 'uid': 140, 'passwd': 'x', 'gid': 140, 'groups': ['ricci'], 'home': '/var/lib/ricci', 'fullname': 'ricci daemon user', 'lastlogin': '**Never logged in**', 'name': 'ricci'}, {'shell': '/sbin/nologin', 'uid': 177, 'passwd': 'x', 'gid': 177, 'groups': ['dhcpd'], 'home': '/', 'fullname': 'DHCP server', 'lastlogin': '**Never logged in**', 'name': 'dhcpd'}, {'shell': '/sbin/nologin', 'uid': 170, 'passwd': 'x', 'gid': 170, 'groups': ['avahi-autoipd'], 'home': '/var/lib/avahi-autoipd', 'fullname': 'Avahi IPv4LL Stack', 'lastlogin': '**Never logged in**', 'name': 'avahi-autoipd'}], 'disk-usage': [{'available': '4496428', 'used': '21472900', 'capacity': '83%', 'mounted-on': '/', '1K-blocks': '27359100', 'filesystem': '/dev/mapper/vg_cobbler-lv_root'}, {'available': '961200', 'used': '16', 'capacity': '1%', 'mounted-on': '/dev/shm', '1K-blocks': '961216', 'filesystem': 'tmpfs'}, {'available': '429528', 'used': '40716', 'capacity': '9%', 'mounted-on': '/boot', '1K-blocks': '495844', 'filesystem': '/dev/sda1'}], 'lsb_distrib_release': '6.5', 'pid': 12465, 'pythonpath': ['/usr/bin', '/usr/lib64/python26.zip', '/usr/lib64/python2.6', '/usr/lib64/python2.6/plat-linux2', '/usr/lib64/python2.6/lib-tk', '/usr/lib64/python2.6/lib-old', '/usr/lib64/python2.6/lib-dynload', '/usr/lib64/python2.6/site-packages', '/usr/lib64/python2.6/site-packages/gtk-2.0', '/usr/lib/python2.6/site-packages', '/usr/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg-info'], 'saltpath': '/usr/lib/python2.6/site-packages/salt', 'pythonversion': [2, 6, 6, 'final', 0], 'ntp': [], 'host': 'cobbler', 'os_family': 'RedHat', 'oscodename': 'Final', 'osfinger': 'CentOS-6', 'biosreleasedate': '04/05/2016', 'manufacturer': 'VMware, Inc.', 'num_gpus': 1, 'Hugepage & Swap': {'SwapTotal': 3071, 'HugePages_Free': 0, 'SwapFree': 3071, 'HugePages_Total': 0}, 'virtual': 'VMware', 'disks': ['ram0', 'ram1', 'ram2', 'ram3', 'ram4', 'ram5', 'ram6', 'ram7', 'ram8', 'ram9', 'ram10', 'ram11', 'ram12', 'ram13', 'ram14', 'ram15', 'loop0', 'loop1', 'loop2', 'loop3', 'loop4', 'loop5', 'loop6', 'loop7', 'sr0'], 'cpu_model': 'Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz', 'osmajorrelease': '6', 'pythonexecutable': '/usr/bin/python2.6', 'productname': 'VMware Virtual Platform', 'osarch': 'x86_64', 'cpuarch': 'x86_64', 'lsb_distrib_codename': 'Final', 'osrelease_info': [6, 5], 'locale_info': {'detectedencoding': 'ascii', 'defaultlanguage': None, 'defaultencoding': None}, 'gpus': [{'model': 'SVGA II Adapter', 'vendor': 'unknown'}], 'routes': [{'destination': '192.168.3.0', 'addr_family': 'inet', 'netmask': '255.255.255.0', 'flags': 'U', 'interface': 'eth0', 'gateway': '0.0.0.0'}, {'destination': '169.254.0.0', 'addr_family': 'inet', 'netmask': '255.255.0.0', 'flags': 'U', 'interface': 'eth0', 'gateway': '0.0.0.0'}, {'destination': '0.0.0.0', 'addr_family': 'inet', 'netmask': '0.0.0.0', 'flags': 'UG', 'interface': 'eth0', 'gateway': '192.168.3.1'}, {'destination': 'fe80::/64', 'addr_family': 'inet6', 'netmask': '', 'flags': 'U', 'interface': 'eth0', 'gateway': '::'}, {'destination': '::1/128', 'addr_family': 'inet6', 'netmask': '', 'flags': 'U', 'interface': 'lo', 'gateway': '::'}, {'destination': 'fe80::20c:29ff:fec3:162d/128', 'addr_family': 'inet6', 'netmask': '', 'flags': 'U', 'interface': 'lo', 'gateway': '::'}, {'destination': 'ff00::/8', 'addr_family': 'inet6', 'netmask': '', 'flags': 'U', 'interface': 'eth0', 'gateway': '::'}], 'path': '/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin', 'machine_id': 'bc636fd19e72da5eae3eb4d90000000e', 'os': 'CentOS', 'iptable': {}}, 'retcode': 0, 'success': True, 'cmd': '_return', '_stamp': '2017-09-04T09:54:53.005225', 'fun': 'grains.items', 'id': 'cobbler', 'out': 'nested'}}) (baff20af-9ee2-4a4d-aca9-b3aba6a8b747)
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 high: Job OK (baff20af-9ee2-4a4d-aca9-b3aba6a8b747)
+17:54:53 Result is kept for 500 seconds
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+17:54:53 
+17:54:53 *** Listening on high, default, low...
+17:54:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:00:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:06:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:12:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:18:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:24:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:30:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:36:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:42:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+18:48:53 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.

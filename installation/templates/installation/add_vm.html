@@ -1,0 +1,196 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Mosaddek">
+    <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+    <link rel="shortcut icon" href="{%static 'img/favicon.ico'%}">
+
+    {% block title %}
+    <title> 自动化运维平台 </title>
+    {% endblock %}
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+    <link href="{%static 'css/bootstrap-reset.css'%}" rel="stylesheet">
+    <!--external css-->
+    <link href="{%static 'assets/font-awesome/css/font-awesome.css'%}" rel="stylesheet" />
+    <!-- Custom styles for this template -->
+    <link href="{%static 'css/style.css'%}" rel="stylesheet">
+    <link href="{%static 'css/style-responsive.css'%}" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
+    <!--[if lt IE 9]>
+      <script src="{%static 'js/html5shiv.js'%}"></script>
+      <script src="{%static 'js/respond.min.js'%}"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <section class="wrapper site-min-height">
+        <!-- page start-->
+        <div class="row">
+          <div class="col-lg-12">
+              <!--breadcrumbs start -->
+              <ul class="breadcrumb">
+                  <li><a href="#"></i>部署平台</a></li>
+                  <li><a href="#">虚拟机安装</a></li>
+                  <li class="active">新建虚拟机</li>
+              </ul>
+              <!--breadcrumbs end -->
+          </div>
+        </div>
+        <section class="panel">
+          <div class="panel-body">
+              <form class="form-horizontal" role="form" action="{% url 'installation:add_vm' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>VM_Name *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                          <input class="form-control" name="vm_name" required="required" type="text">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>VM_CPU *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                          <input class="form-control" name="vm_cpus" required="required" type="text">
+                      </div>
+                    </div>
+                   
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>VM_CPU_Socket *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                          <input class="form-control" name="vm_cpu_sockets" required="required" type="text">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>VM_Memery(M) *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                          <input class="form-control" name="vm_memory" required="required" type="text">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>Power *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <select name="power" required="required" class="form-control col-md-3">
+                          <option value ="1">On</option>
+                          <option value ="0">Off</option>
+                        </select>
+                      </div>
+                    </div>
+                  
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>Template *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <select name="template" required="required" class="form-control col-md-3">
+                          <option value ="-1">--请选择--</option>
+                          {% for template in templates %}
+                            <option value ="{{template.name}}">{{template.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+              
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>Vcenter *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <select name="vcenter" id='vc' onchange="get_obj('vc','dc')" required="required" class="form-control col-md-3">
+                          <option value ="-1">--请选择--</option>
+                          {% for vcenter in vcenters %}
+                            <option value ="{{vcenter.name}}">{{vcenter.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>DataCenter *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <select name="datacenter" id='dc' onchange="get_obj('dc','cluster')" required="required" class="form-control col-md-3">
+                          <option value ="-1">--请选择--</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>Cluster *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <select name="cluster" id='cluster' onchange="get_obj('cluster','esxi')" required="required" class="form-control col-md-3">
+                          <option value ="-1">--请选择--</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-lg-2 col-md-3 col-sm-3 col-xs-3 control-label" style="width: 150px;"><span>DataStore *</span></label>
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <select name="datastore" id='ds' required="required" class="form-control col-md-3">
+                          <option value ="-1">--请选择--</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="col-xs-8 col-md-6 col-sm-6">
+                        <button type="submit" class="btn">Submit</button>
+                      </div>
+                    </div>
+              </form>
+          </div>          
+        </section>
+        <!-- page end-->
+    </section>
+
+  <script src="{%static 'js/jquery.js'%}"></script>
+  <script src="{%static 'js/jquery-1.8.3.min.js'%}"></script>
+
+  <script type="text/javascript">
+    function get_obj(this_id,next_id){
+      var val=$("#"+this_id).val();
+      $("#"+next_id).empty();
+      if(val!="-1"){
+        $.ajax({
+          type:"GET",
+          url:'/installation/vm/get_obj',
+          data:{'type':this_id,'val':val},
+          dataType:"Json",
+          async : false, 
+          success:function(result){
+             $("#"+next_id).append("<option value = '" + '-1'  + "'>" + '--请选择--' + "</option>");
+             $.each(result,function(key,value)
+                {
+                  $("#"+next_id).append("<option value = '" + key  + "'>" + value + "</option>");
+                }
+             );
+             if (this_id == 'vc'){
+                $("#ds").empty();
+                $.ajax({
+                    type:"GET",
+                    url:'/installation/vm/get_obj',
+                    data:{'type':'ds','val':val},
+                    dataType:"Json",
+                    async : false, 
+                    success:function(result){
+                       $("#ds").append("<option value = '" + '-1'  + "'>" + '--请选择--' + "</option>");
+                       $.each(result,function(key,value)
+                          {
+                            $("#ds").append("<option value = '" + key  + "'>" + value + "</option>");
+                          }
+                       );
+                    }
+                });
+             }
+          }
+        });
+      };
+    }
+  </script>
+  </body>
+</html>

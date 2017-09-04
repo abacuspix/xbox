@@ -1,0 +1,63 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"  charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <br>
+ 
+    <form class="form-horizontal" action="{% url 'installation:update_ipmi' server.id %}" method="post">
+        {% csrf_token %}
+            <div class="form-group" >
+            <!-- <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">IPMI地址
+            <span class="required">*</span> -->
+            </label>
+            <div class="col-md-3 col-sm-4 col-xs-12 text-center" >
+                <!-- <input class="form-control col-md-7 col-xs-12" name="ipmi_ip" required="required" type="text"> -->
+                <p>{{ret}}</p>
+            </div>
+          </div>
+          <div class="form-group" >
+            <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">IPMI地址
+            <span class="required">*</span>
+            </label>
+            <div class="col-md-3 col-sm-4 col-xs-6" >
+            	<input class="form-control col-md-7 col-xs-12" name="ipmi_ip" required="required" type="text" value="{{server.ipmi_ip}}">
+            </div>
+          </div>
+          <div class="form-group" >
+            <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">IPMI账号
+            <span class="required">*</span>
+            </label>
+            <div class="col-md-3 col-sm-4 col-xs-6" >
+            	<input class="form-control col-md-7 col-xs-12" name="ipmi_user" required="required" type="text" value="{{server.ipmi_user | default_if_none:''}}">
+            </div>
+          </div>
+          <div class="form-group" >
+            <label class="control-label col-md-3 col-sm-3 col-xs-4 text-right">IPMI账号密码
+            <span class="required">*</span>
+            </label>
+            <div class="col-md-3 col-sm-4 col-xs-6" >
+            	<input class="form-control col-md-7 col-xs-12" name="ipmi_pass" required="required" type="passwrod" value="{{server.ipmi_pass | default_if_none:''}}">
+            </div>
+          </div>
+
+
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <div class="col-md-6 col-sm-6 col-xs-12" style="padding-left: 160px;">
+              <button type="submit" class="btn">提交</button>
+            </div>
+          </div>
+    </form>
+
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+  <body>

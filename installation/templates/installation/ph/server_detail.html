@@ -1,0 +1,174 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"  charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+
+  </head>
+
+  <body>
+        <a href="#" class="list-group-item active" style="background-color: #444f58;">
+            <h4 class="list-group-item-heading">
+                基本信息
+            </h4>
+        </a>
+
+        <div class="col-xs-12 col-sm-12">
+            <br>
+            <ul class="list-group">
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">服务器 ID:</b>{{server.id}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">服务器厂商:</b> {{server.vendor}}</li> 
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">服务器型号:</b> {{server.model}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">PXE IP:</b> {{server.pxe_ip}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">IPMI IP:</b> {{server.ipmi_ip}}</li>
+            </ul>
+        </div>
+
+        <a href="#" class="list-group-item active" style="background-color: #444f58;">
+            <h4 class="list-group-item-heading">
+                硬件信息
+            </h4>
+        </a>
+
+        <br/>
+        <div class="col-xs-12 col-sm-12">
+            <br>
+            <p class="list-group-item-text">
+                <h5 class="list-group-item-heading">CPU信息:</h5>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">CPU型号:</b>{{server.cpu_model}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">CPU Sockets:</b> {{server.cpu_sockets}}</li> 
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">CPU Cores:</b> {{server.cpu_cores}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">CPU Threads:</b> {{server.cpu_threads}}</li>
+            </p>
+        </div>
+
+        <div class="col-xs-12 col-sm-12">
+            <br>
+            <p class="list-group-item-text">
+                <h5 class="list-group-item-heading">内存信息:</h5>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">总内存(G):</b>{{server.mem_size}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">槽位数:</b> {{server.mem_total_slots}}</li> 
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">剩余槽位:</b> {{server.mem_free_slots}}</li>
+            </p>          
+        </div>
+
+
+
+       <div class="col-xs-12 col-sm-12">
+          <br>
+          <h5 class="list-group-item-heading">硬盘信息:</h5>
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td>硬盘路径</td>
+                    <td>大小</td>
+                    <td>类型</td>
+                  </tr>
+                </thead>
+                
+                <tbody>
+                {% for disk in server.disk_set.all %}
+                  <tr>
+                    <td>{{disk.path}}</td>
+                    <td>{{disk.size}}</td>
+                    <td>{{disk.dtype}}</td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+            </table>        
+       </div>
+ 
+        <!-- </p> -->
+ 
+      <div class="col-xs-12 col-sm-12">
+        <br>
+        <h5 class="list-group-item-heading">网卡信息:</h5>
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td>名称</td>
+                    <td>MAC</td>
+                    <td>型号</td>
+                  </tr>
+                </thead>
+                
+                <tbody>
+                {% for nic in server.nic_set.all %}
+                  <tr>
+                    <td>{{nic.name}}</td>
+                    <td>{{nic.mac}}</td>
+                    <td>{{nic.model}}</td>
+                {% endfor %}
+                </tbody>
+            </table>
+       </div>
+
+<!--         <a href="#" class="list-group-item active" style="background-color: #444f58;">
+            <h4 class="list-group-item-heading">
+                附加信息
+                <button onclick="edit_server('{{server.id}}')" class="btn btn-xs">编辑</button>
+            </h4>
+        </a>
+
+        <div class="col-xs-12 col-sm-12">
+            <br>
+            <ul class="list-group">
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">机房:</b>
+                {% if server.cabinet.idc.name %}
+                  {{server.cabinet.idc.name}}
+                {% else %}
+                  None
+                {% endif %}  
+                </li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">机柜:</b>
+                {% if server.cabinet.name %}
+                  {{server.cabinet.name}}
+                {% else %}
+                  None
+                {% endif %} 
+                </li> 
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">位置(U):</b> {{server.unit}}</li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">环境:</b>
+                {% if server.environment %}
+                  {{server.environment.name }}
+                {% else %}
+                  None
+                {% endif %}         
+                </li>
+                <li class="list-group-item"><b class="col-xs-3 col-sm-3 text-right">联系人:</b>
+                {% if server.contacter %}
+                  {{server.contacter.name }}
+                {% else %}
+                  None
+                {% endif %}         
+                </li>
+            </ul>
+        </div> -->
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script src="{%static 'layer/layer.js'%}"></script>
+<!--     <script type="text/javascript">
+            function edit_server(server_id){
+              var index = layer.open({
+                  type: 2,
+                  title: "编辑服务器信息",
+                  scrollbar: false,
+                  area: ['350px', '350px'],
+                  shadeClose: true,
+                  shift: 5,
+                  moveOut: true,
+                  content: ['/installation/server/edit/' + server_id,'no'],
+                  end : function(){
+                      window.location.reload();
+                    }
+                });
+            }
+    </script> -->
+
+  </body>
+</html>

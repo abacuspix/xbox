@@ -1,0 +1,137 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Mosaddek">
+    <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+    <link rel="shortcut icon" href="{%static 'img/favicon.ico'%}">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+    <link href="{%static 'css/bootstrap-reset.css'%}" rel="stylesheet">
+    <!--external css-->
+    <link href="{%static 'assets/font-awesome/css/font-awesome.css'%}" rel="stylesheet" />
+    <!-- Custom styles for this template -->
+    <link href="{%static 'css/style.css'%}" rel="stylesheet">
+    <link href="{%static 'css/style-responsive.css'%}" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
+    <!--[if lt IE 9]>
+      <script src="{%static 'js/html5shiv.js'%}"></script>
+      <script src="{%static 'js/respond.min.js'%}"></script>
+    <![endif]-->
+
+    
+  </head>
+                      
+  <body>
+
+<div class="panel-body">
+              <div class="tab-content">
+                  <div class="tab-pane active">
+                        <div class="mail-option">
+                               <div class="btn-group">
+                                  <a href="{% url 'installation:add_system' server.id %}" class=" label label-inverse">添加系统</a>
+                               </div>
+                        </div>
+                        <table class="table table-inbox table-hover" border="5">
+                          <thead>
+                                  <tr>
+                                    <th><small>系统名称</small></th>
+                                    <th><small>操作</small></th>
+                                  </tr>
+                            </thead>
+                              <tbody>
+                                {% for system in ret_data.comment %}
+                                  <tr>
+                                    <td>{{ system }}</td>
+                                    <td>
+	                                    <small><a onclick="detail('系统{{ system }}详细信息','','600px','380px','/installation/server/system/view/','{{ system }}')" class="label label-inverse"><i class="fa fa-folder"></i> 系统详情 </a></small>&nbsp&nbsp
+	                                    <small><a onclick="confirm('{{ system }}','{{server.id}}','delete')" class="label label-inverse"><i class="fa fa-trash-o"></i> 删除系统 </a></small>
+                                    </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                        </table>
+                      </div>
+              </div>
+          </div>  
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script class="include" type="text/javascript" src="{%static 'js/jquery.dcjqaccordion.2.7.js'%}"></script>
+    <script src="{%static 'js/jquery.scrollTo.min.js'%}"></script>
+    <script src="{%static 'js/jquery.nicescroll.js'%}" type="text/javascript"></script>
+    <script src="{%static 'js/respond.min.js'%}" ></script>
+
+    <!--common script for all pages-->
+    <script src="{%static 'js/common-scripts.js'%}"></script>
+    <script src="{%static 'layer/layer.js'%}"></script>
+
+    <script type="text/javascript">
+      function detail(title,sn,width,height,url,fun){   
+          layer.open({
+            type: 2,
+            offfset: 'rb',
+            shade: [0.5, '#393D49'],
+            shadeClose: true, //点击遮罩关闭层
+            title: title,
+            // maxmin: true,
+            area : [ width,height],
+            content: url + fun + sn
+          });
+          // layer.full(index);
+      }
+
+      function confirm(system,server_id,fun){
+        if (fun == 'delete'){
+            layer.confirm('请确认是否要删除' + ' ' + system, function(index){
+              window.location.href = "/installation/server/system/delete/" + system + '/' + server_id
+              layer.close(index);
+          });       
+        }
+        else {
+            layer.confirm('请确认是否要安装', function(index){
+              $.post("{% url 'installation:server_power' %}",{'ids':[server_id],'act':act},function(data) {
+                  if (data == '{}')
+                  {
+                    layer.msg('正在安装...');
+                  }
+                  else
+                  {
+                    layer.alert(data,function(){
+                        window.location.reload();//刷新
+                      });
+                  }
+
+              });
+              layer.close(index);
+          });       
+        }
+
+      }
+    </script>
+
+	  {% if messages %}
+	        {% for message in messages %}
+	            {% if message.tags == 'error' %}
+	               <script type="text/javascript">
+	                 layer.alert('{{ message }}',function() {
+	                  var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+	                  parent.layer.close(index); //再执行关闭   
+
+	                 });
+	                 
+	               </script>
+	            {% endif %}
+	                  
+	        {% endfor %}
+	  {% endif %}        
+	
+  </body>
+</html>
