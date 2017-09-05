@@ -161,6 +161,10 @@ SALT_IP = '192.168.3.169'
 SALT_PORT = '8080'
 SALT_USER = 'salt_api'
 SALT_PASSWD = 'salt_api'
+MONGO_IP = '192.168.3.169'
+MONGO_PORT = '27017'
+from pymongo import MongoClient
+MONGO_CLIENT = MongoClient(MONGO_IP,int(MONGO_PORT))
 
 LOGGING = {
     'version': 1,

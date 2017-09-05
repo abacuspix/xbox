@@ -11,10 +11,12 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
 from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD
+from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
 from json2html import *
 from django.db.models import Q
+import time
 # Create your views here.
 
 @login_required
@@ -175,50 +177,52 @@ def hosts(request):
 	return render(request,'opsdb/host/hosts.html',locals())
 
 def host(request,id):
-	host = mongo_salt.salt_grains.find_one({'id':id})
+	hosts = MONGO_CLIENT.salt.salt_grains.find({'id':id}).sort([("_id", -1)]).limit(1)
 	grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
-	if host:
-		ret = host.get('return',None)
-		# operation system info
-		grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
-		grains['os']['fqdn'] = ret.get('fqdn',None)
-		grains['os']['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
-		grains['os']['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
-		grains['os']['disk-usage'] = ret.get('disk-usage',None)
-		grains['os']['selinux'] = ret.get('selinux',None)
-		grains['os']['fqdn_ip4'] = ret.get('fqdn_ip4',None)
-		grains['os']['ip4_interfaces'] = ret.get('ip4_interfaces',None)
-		grains['os']['ip6_interfaces'] = ret.get('ip6_interfaces',None)
-		grains['os']['routes'] = ret.get('routes',None)
-		grains['os']['dns'] = ret.get('dns',None)
-		grains['os']['ntp'] = ret.get('ntp',None)
-		grains['os']['iptable'] = ret.get('iptable',None)
-		grains['os']['systemd'] = ret.get('systemd',None)
-		grains['os']['lsb_distrib'] = {'id':ret['lsb_distrib_id'],'codename':ret['lsb_distrib_codename']}
-		os = json2html.convert(json = grains['os'])
+	if hosts:
+		for host in hosts:
+			print host['_stamp'],'==============='
+			ret = host.get('return',None)
+			# operation system info
+			grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
+			grains['os']['fqdn'] = ret.get('fqdn',None)
+			grains['os']['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
+			grains['os']['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
+			grains['os']['disk-usage'] = ret.get('disk-usage',None)
+			grains['os']['selinux'] = ret.get('selinux',None)
+			grains['os']['fqdn_ip4'] = ret.get('fqdn_ip4',None)
+			grains['os']['ip4_interfaces'] = ret.get('ip4_interfaces',None)
+			grains['os']['ip6_interfaces'] = ret.get('ip6_interfaces',None)
+			grains['os']['routes'] = ret.get('routes',None)
+			grains['os']['dns'] = ret.get('dns',None)
+			grains['os']['ntp'] = ret.get('ntp',None)
+			grains['os']['iptable'] = ret.get('iptable',None)
+			grains['os']['systemd'] = ret.get('systemd',None)
+			grains['os']['lsb_distrib'] = {'id':ret['lsb_distrib_id'],'codename':ret['lsb_distrib_codename']}
+			os = json2html.convert(json = grains['os'])
 
-		# software info
-		grains['software'] = ret.get('software',None)
-		users = json2html.convert(json = grains['software'])
+			# software info
+			grains['software'] = ret.get('software',None)
+			users = json2html.convert(json = grains['software'])
 
-		# system user info
-		grains['users'] = ret.get('users',None)
-		users = json2html.convert(json = grains['users'])
+			# system user info
+			grains['users'] = ret.get('users',None)
+			users = json2html.convert(json = grains['users'])
 
-		# hardware info
-		grains['hardware']['virtual'] = ret.get('virtual',None)
-		grains['hardware']['serialnumber'] = ret.get('serialnumber',None)
-		grains['hardware']['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
-		grains['hardware']['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
-		grains['hardware']['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
-		grains['hardware']['HBA'] = ret.get('HBA',None)
-		hardware = json2html.convert(json = grains['hardware'])
+			# hardware info
+			grains['hardware']['virtual'] = ret.get('virtual',None)
+			grains['hardware']['serialnumber'] = ret.get('serialnumber',None)
+			grains['hardware']['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
+			grains['hardware']['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
+			grains['hardware']['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
+			grains['hardware']['HBA'] = ret.get('HBA',None)
+			hardware = json2html.convert(json = grains['hardware'])
 
-		# user cron info
-		cron = json2html.convert(json = grains['cron'])
+			# user cron info
+			cron = json2html.convert(json = grains['cron'])
 
-		# summary info
-		summary = json2html.convert(json = ret)
+			# summary info
+			summary = json2html.convert(json = ret)
 
 	return render(request,'opsdb/host/host.html',locals())
 
@@ -442,3 +446,43 @@ def delete_hostgroup(request):
 	except Exception as e:
 		ret = str(e)
 	return HttpResponse(ret)
+
+@login_required
+@role_required('hostadmin')
+def cmd(request):
+	if request.method == 'POST':
+		user = request.user.username
+		if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+			client =  request.META['HTTP_X_FORWARDED_FOR']  
+		else:
+			client = request.META['REMOTE_ADDR']
+		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
+		try:
+			arg_list = request.POST.get('cmd','') if request.POST.get('cmd','') else []
+			hosts = request.POST.get('hosts','')
+			target = hosts.split(',')
+			result = salt.run(fun='cmd.run',target=target,arg_list=arg_list)
+			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+			'target':target,'fun':'cmd.run','arg':arg_list,\
+			'status':'','progress':'Finish','result':result,'cjid':str(int(round(time.time() * 1000)))}
+			MONGO_CLIENT.salt.joblist.insert_one(job)
+		except Exception as e:
+			error = str(e)
+	return render(request, 'opsdb/ops/cmd.html',locals())	
+
+
+@login_required
+@role_required('hostadmin')
+def select_hosts(request):
+	if request.user.is_superuser:
+		host_list = Host.objects.select_related().all()
+	else:
+		if request.user.groups:
+			host_list = []
+			for group in request.user.groups.all():
+				for hostgroup in group.rule.hostgroups.all():
+					host_list.extend(hostgroup.host_set.all())
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,hosts,page_number = my_paginator(host_list,page,page_number)
+	return render(request,'opsdb/ops/select_hosts.html',locals())

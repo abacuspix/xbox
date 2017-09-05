@@ -37,4 +37,6 @@ urlpatterns = [
     url(r'^hostgroups/add/$',views.add_hostgroup,name='add_hostgroup'),
     url(r'^hostgroups/edit/(\d+)/$',views.edit_hostgroup,name='edit_hostgroup'),
     url(r'^hostgroups/delete/$',views.delete_hostgroup,name='delete_hostgroup'),
+    url(r'^ops/cmd/$',views.cmd,name='cmd'),
+    url(r'^ops/select_hosts/$',views.select_hosts,name='select_hosts'),
 ]

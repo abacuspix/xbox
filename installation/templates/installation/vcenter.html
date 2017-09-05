@@ -269,9 +269,6 @@
             title: '添加Vcenter',
             area : ['500px','400px'],
             content: "{% url 'installation:add_vcenter' %}",
-            success: function(layero, index){
-                layer.close(index);
-            },
             end: function(){
                window.location.reload();
             }

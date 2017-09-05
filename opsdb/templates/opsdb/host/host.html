@@ -1,0 +1,93 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Mosaddek">
+    <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+    <link rel="shortcut icon" href="{%static 'img/favicon.ico'%}">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+    <link href="{%static 'css/bootstrap-reset.css'%}" rel="stylesheet">
+    <!--external css-->
+    <link href="{%static 'assets/font-awesome/css/font-awesome.css'%}" rel="stylesheet" />
+    <!-- Custom styles for this template -->
+    <link href="{%static 'css/style.css'%}" rel="stylesheet">
+    <link href="{%static 'css/style-responsive.css'%}" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
+    <!--[if lt IE 9]>
+      <script src="{%static 'js/html5shiv.js'%}"></script>
+      <script src="{%static 'js/respond.min.js'%}"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <section class="wrapper site-min-height">
+        <!-- page start-->
+        <div class="row">
+          <div class="col-lg-12">
+              <!--breadcrumbs start -->
+              <ul class="breadcrumb">
+                  <li><a href="#"></i>运维数据库</a></li>
+                  <li><a href="{% url 'opsdb:hosts' %}"></i>主机</a></li>
+                  <li class="active">主机信息</li>
+              </ul>
+              <!--breadcrumbs end -->
+          </div>
+        </div>
+
+        <section class="panel">
+            <header class="panel-heading tab-bg-dark-navy-blue ">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a data-toggle="tab" href="#os" style="left: 15px;">操作系统</a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#user" style="left: 15px;">系统用户</a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#software" style="left: 15px;">系统软件</a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#hardware" style="left: 15px;">系统硬件</a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#cron" style="left: 15px;">定时作业</a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#summary" style="left: 15px;">概览</a>
+                    </li>
+                </ul>
+            </header>
+            <div class="panel-body">
+                <div class="tab-content">
+                    <div id="os" class="tab-pane active">{% autoescape off %}{{os}}{% endautoescape %}</div>
+                    <div id="user" class="tab-pane">{% autoescape off %}{{users}}{% endautoescape %}</div>
+                    <div id="software" class="tab-pane">{% autoescape off %}{{software}}{% endautoescape %}</div>
+                    <div id="hardware" class="tab-pane">{% autoescape off %}{{hardware}}{% endautoescape %}</div>
+                    <div id="cron" class="tab-pane">{% autoescape off %}{{cron}}{% endautoescape %}</div>
+                    <div id="summary" class="tab-pane">{% autoescape off %}{{summary}}{% endautoescape %}</div>
+                </div>
+            </div>
+        </section>
+        <!-- page end-->
+    </section>
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script class="include" type="text/javascript" src="{%static 'js/jquery.dcjqaccordion.2.7.js'%}"></script>
+    <script src="{%static 'js/jquery.scrollTo.min.js'%}"></script>
+    <script src="{%static 'js/jquery.nicescroll.js'%}" type="text/javascript"></script>
+    <script src="{%static 'js/respond.min.js'%}" ></script>
+
+    <!--common script for all pages-->
+    <script src="{%static 'js/common-scripts.js'%}"></script>
+    <script src="{%static 'layer/layer.js'%}"></script>
+  </body>
+</html>
