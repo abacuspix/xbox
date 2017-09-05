@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-def paginator(list_obj,page,page_number):
+def my_paginator(list_obj,page,page_number):
 	if page_number:
 		page_number = int(page_number)
 	else:
@@ -14,4 +14,4 @@ def paginator(list_obj,page,page_number):
 	except EmptyPage:
 		# If page is out of range (e.g. 9999), deliver last page of results.
 		ret = paginator.page(paginator.num_pages)
-	return ret,page_number
+	return paginator,ret,page_number

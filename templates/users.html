@@ -175,7 +175,8 @@
                                     <td><small>{{user.profile.created_by | default_if_none:""}}</small></td>
                                     <td><small>{{user.last_login | date:'Y-m-d H:m:s'}}</small></td>
                                     <td><small data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="{{user.profile.comment}}">{{user.profile.comment | truncatewords:5}}</small></td>
-                                    <td style="width: 86px;"><small><button><a href="{% url 'edit_user' user.id %}">编辑</a></button></small></td>
+                                    <td style="width: 50px;"><small>
+                                    <button class="btn btn-primary btn-xs"><a href="{% url 'edit_user' user.id %}"><i class="icon-pencil"></i></a></button></small></td>
                                   </tr>
                                 {% endfor %}
                               </tbody>

@@ -87,14 +87,14 @@
                                    <a href="{% url 'opsdb:add_host' %}"><button type="button" class="btn label label-inverse"><i class="icon-plus"></i> 添加主机</button></a>
                                </div>
                                <div class="btn-group">
-                                   <a href="{% url 'opsdb:add_host' %}"><button type="button" class="btn label label-inverse"><i class="icon-edit"></i> 批量编辑</button></a>
+                                   <a href="{% url 'opsdb:edit_host_batch' %}"><button type="button" class="btn label label-inverse"><i class="icon-edit"></i> 批量编辑</button></a>
                                </div>
                                <div class="btn-group hidden-phone">
                                     <button data-toggle="dropdown" class="btn label label-inverse dropdown-toggle" type="button"><i class="icon-th-large"></i>&nbsp更多操作&nbsp&nbsp <span class="caret"></span></button>
                                     <ul role="menu" class="dropdown-menu" style="min-width: 83.8px;width: 83.8px;">
-                                        <li><a href="{% url 'opsdb:search_exact' %}" style="padding-left: 5px;"><small>批量添加</small></a></li>
+                                        <li><a href="{% url 'opsdb:add_host_batch' %}" style="padding-left: 5px;"><small>批量添加</small></a></li>
                                         <li><a href="{% url 'opsdb:search_exact' %}" style="padding-left: 5px;"><small>高级搜索</small></a></li>
-                                        <li><a href="{% url 'opsdb:search_exact' %}" style="padding-left: 5px;"><small>批量删除</small></a></li>
+                                        <li><a onclick="delete_host_batch()" style="padding-left: 5px;"><small>批量删除</small></a></li>
                                     </ul>
                                  </div>
                                  
@@ -171,16 +171,12 @@
                                           {% endfor %}                                        
                                         </small>
                                     </td>
-                                    <td>
-                                        <small>
-                                          {% for app in host.applications.all %}
-                                            {{app.business.environment.name}}
-                                          {% endfor %}
-                                        </small>
-                                    </td>
-                                    <td style="width: 106px;"><small>
-                                      <button><a href="">编辑</a></button>
-                                      <button><a href="">删除</a></button></small>
+                                    <td><small>{{ host.environment.name }}</small></td>
+                                    <td style="width: 76px;">
+                                      <small>
+                                        <button class="btn btn-primary btn-xs"><a href="{% url 'opsdb:edit_host' host.id %}"><i class="icon-pencil"></i></a></button>
+                                        <button class="btn btn-danger btn-xs"><a href="{% url 'opsdb:delete_host' host.id %}"><i class="icon-trash"></i></a></button>
+                                      </small>
                                     </td>
                                     </tr>
                                 {% endfor %}
@@ -241,36 +237,36 @@
             return ids
       }
 
-      function edit_host() {
-          var ids = get_server_id();
-          if (ids.length == 0 )
-          {
-            layer.alert("请先选中主机");
-          }
-          else
-          {   
-            var index = layer.open({
-                type: 2,
-                title: "添加主机到主机组/应用",
-                area: ['700px', '400px'],
-                shift: 5,
-                moveOut: true,
-                content: "{% url 'opsdb:edit_host' %}",
-                success: function(layero, index){
-                  var body = layer.getChildFrame('body',index);//建立父子联系
-                  var iframeWin = window[layero.find('iframe')[0]['name']];
-                  // console.log(arr); //得到iframe页的body内容
-                  var inputList = body.find('input');
-                  $(inputList[1]).val(ids);
-                },
-                end: function() {
-                  window.location.reload();
-                }
-            })
-          }
-      }
+      // function edit_host_batch() {
+      //     var ids = get_server_id();
+      //     if (ids.length == 0 )
+      //     {
+      //       layer.alert("请先选中主机");
+      //     }
+      //     else
+      //     {   
+      //       var index = layer.open({
+      //           type: 2,
+      //           title: "添加主机到主机组/应用",
+      //           area: ['700px', '400px'],
+      //           shift: 5,
+      //           moveOut: true,
+      //           content: "{% url 'opsdb:edit_host_batch' %}",
+      //           success: function(layero, index){
+      //             var body = layer.getChildFrame('body',index);//建立父子联系
+      //             var iframeWin = window[layero.find('iframe')[0]['name']];
+      //             // console.log(arr); //得到iframe页的body内容
+      //             var inputList = body.find('input');
+      //             $(inputList[1]).val(ids);
+      //           },
+      //           end: function() {
+      //             window.location.reload();
+      //           }
+      //       })
+      //     }
+      // }
 
-      function delete_host() {
+      function delete_host_batch() {
         var ids = get_server_id();
         if (ids.length ==0 )
         {
@@ -279,17 +275,17 @@
         else
         {   
             layer.confirm('请确认是否要删除', function(index){
-                  $.post("{% url 'opsdb:delete_host' %}",{'ids':ids},function(data){
+                  $.post("{% url 'opsdb:delete_host_batch' %}",{'ids':ids},function(data){
                     layer.close(index);
                     if (data == 'success')
                     {
                       document.getElementById('message').innerHTML='<div class="alert alert-success fade in"> <button data-dismiss="alert" class="close close-sm" type="button"> <i class="icon-remove"></i> </button> <strong>Success !</strong> 删除成功</div>';
+                      setTimeout("window.location.reload()", 2000);
                     }
                     else
                     {
                       document.getElementById('message').innerHTML='<div class="alert alert-block alert-danger fade in"> <button data-dismiss="alert" class="close close-sm" type="button"> <i class="icon-remove"></i> </button> <strong>Error !</strong>' + data + '</div>';
                     }
-                    setTimeout("window.location.reload()", 2000);
                   });
                       
             }); 

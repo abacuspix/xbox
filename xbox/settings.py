@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'audit',
     'easyaudit',
     'opsdb',
+    'installation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -156,6 +157,10 @@ STATICFILES_DIRS = (
 
 FTP_IP = '192.168.3.169'
 FTP_PORT = '80'
+SALT_IP = '192.168.3.169'
+SALT_PORT = '8080'
+SALT_USER = 'salt_api'
+SALT_PASSWD = 'salt_api'
 
 LOGGING = {
     'version': 1,

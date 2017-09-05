@@ -140,7 +140,9 @@
                                   <td><small>{{env.host.count}}</small></td>
                                   <!-- <td><small>{{env.application.count}}</small></td> -->
                                   <td><small>{{env.comment}}</small></td>
-                                  <td style="width: 86px;"><small><button><a href="{% url 'opsdb:edit_env' env.id %}">编辑</a></button></small></td>
+                                   <td style="width: 50px;"><small>
+                                    <button class="btn btn-primary btn-xs"><a href="{% url 'opsdb:edit_env' env.id %}"><i class="icon-pencil"></i></a></button></small>
+                                  </td>
                                 </tr>
                               {% endfor %}
                             </tbody>

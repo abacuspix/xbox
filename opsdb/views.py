@@ -6,11 +6,15 @@ from django.shortcuts import redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from xbox.decorators import role_required
-from xbox.paginator import paginator
+from xbox.paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
+from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD
+from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
+from json2html import *
+from django.db.models import Q
 # Create your views here.
 
 @login_required
@@ -19,7 +23,7 @@ def envs(request):
 	env_list = Environment.objects.all()
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	envs,page_number = paginator(env_list,page,page_number)
+	paginator,envs,page_number = my_paginator(env_list,page,page_number)
 	return render(request,'opsdb/env/envs.html',locals())
 
 @login_required
@@ -71,7 +75,7 @@ def rules(request):
 	rule_list = Rule.objects.all()
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	rules,page_number = paginator(rule_list,page,page_number)
+	paginator,rules,page_number = my_paginator(rule_list,page,page_number)
 	return render(request,'opsdb/rule/rules.html',locals())
 
 @login_required
@@ -127,6 +131,35 @@ def add_host(request):
 
 @login_required
 @role_required('hostadmin')
+@csrf_exempt
+def add_host_batch(request):
+	if request.method == "GET":
+		hostinfo = '''#请按照实例格式编辑主机信息:
+﻿﻿#IP地址           SSH端口     SSH用户    SSH密码(仅用于安装客户端，不保存)
+192.168.1.1     22                root           12345678
+192.168.1.2     22                root           87654321'''
+		return render(request,'opsdb/host/add_host_batch.html',locals())
+	else:
+		hostinfo = request.POST.get('hostinfo','')
+		lines = hostinfo.split('\n')
+		result = {}
+		for line in lines:
+			host = line.split()
+			ip,port,user,passwd = host[0],host[1],host[2],host[3]
+			cmd = "curl -s http://%s:%s/install-minion.sh | sh 2>&1"%(FTP_IP,FTP_PORT)
+			ret = remote_cmd(cmd,ip,port=int(port),user=user,passwd=passwd,timeout=10)
+			if ret['status'] and not ret['err']:
+				host,created = Host.objects.get_or_create(ip=ip)
+				if host:
+					result[ip] = {'status':'Success','comment':'添加成功'}
+			else:
+				result[ip] = {'status':'Fail','comment':ret['err']}
+				continue
+		result = json2html.convert(json = result)
+		return render(request,'opsdb/host/add_host_batch.html',locals())
+
+@login_required
+@role_required('hostadmin')
 def hosts(request):
 	if request.user.is_superuser:
 		host_list = Host.objects.select_related().all()
@@ -138,7 +171,7 @@ def hosts(request):
 					host_list.extend(hostgroup.host_set.all())
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	hosts,page_number = paginator(host_list,page,page_number)
+	paginator,hosts,page_number = my_paginator(host_list,page,page_number)
 	return render(request,'opsdb/host/hosts.html',locals())
 
 def host(request,id):
@@ -192,15 +225,29 @@ def host(request,id):
 @login_required
 @role_required('hostadmin')
 @csrf_exempt
-def delete_host(request):
+def delete_host(request,id):
+	host = Host.objects.get(pk=id)
+	salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
+	try:
+		salt.key(client='wheel',fun='key.delete',match=host.minion_id)
+		host.delete()
+		messages.success(request, '主机删除成功')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:hosts')
+
+@login_required
+@role_required('hostadmin')
+@csrf_exempt
+def delete_host_batch(request):
 	ids = request.POST.getlist('ids[]','')
-	salt_master = get_object_or_404(ServiceHost,service='salt_api')
-	salt = SaltAPI(salt_master.ip,salt_master.user,salt_master.password,port=salt_master.port)
+	salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
 	ret = 'success'
 	for host_id in ids:
 		try:
-			salt.key(client='wheel',fun='key.delete',match=tgt)
-			Host.objects.filter(pk=host_id).update(is_delete=True)
+			host = Host.objects.get(pk=host_id)
+			salt.key(client='wheel',fun='key.delete',match=host.minion_id)
+			host.delete()
 		except Exception as e:
 			ret = str(e)
 			break
@@ -208,33 +255,21 @@ def delete_host(request):
 
 def search_host(request):
 	keyword = request.POST.get('keyword','')
-	q = Q(minion_id__icontains=keyword) | Q(ip__icontains=keyword) | Q(os__icontains=keyword) \
+	q = Q(ip__icontains=keyword) | Q(hostname__icontains=keyword) | Q(os__icontains=keyword) \
 	| Q(hostgroups__name__icontains=keyword) | Q(applications__name__icontains=keyword) \
-	| Q(applications__business__name__icontains=keyword) \
-	| Q(applications__business__environment__name__icontains=keyword)| Q(comment__icontains=keyword)
+	| Q(is_virtual__icontains=keyword) | Q(environment__name__icontains=keyword)| Q(comment__icontains=keyword) \
+	| Q(minion_id__icontains=keyword) 
 	if request.user.is_superuser:
-		host_list = Host.objects.select_related().filter(q,is_delete=False).distinct()
+		host_list = Host.objects.select_related().filter(q).distinct()
 	else:
 		if request.user.groups:
 			host_list = []
 			for group in request.user.groups.all():
 				for hostgroup in group.rule.hostgroups.all():
-					host_list.extend(hostgroup.host_set.filter(q,is_delete=False)).distinct()
+					host_list.extend(hostgroup.host_set.filter(q).distinct())
 	page_number =  request.GET.get('page_number')
-	if page_number:
-	    page_number = int(page_number)
-	else:
-	    page_number =  10
-	paginator = Paginator(host_list, page_number)
 	page = request.GET.get('page')
-	try:
-	    hosts = paginator.page(page)
-	except PageNotAnInteger:
-	    # If page is not an integer, deliver first page.
-	    hosts = paginator.page(1)
-	except EmptyPage:
-	    # If page is out of range (e.g. 9999), deliver last page of results.
-	    hosts = paginator.page(paginator.num_pages)
+	paginator,hosts,page_number = my_paginator(host_list,page,page_number)
 	return render(request,'opsdb/host/hosts.html',locals())
 
 def search_exact(request):
@@ -285,7 +320,7 @@ def search_exact(request):
 		    page_number = int(page_number)
 		else:
 		    page_number =  10
-		paginator = Paginator(host_list, page_number)
+		paginator = my_paginator(host_list, page_number)
 		page = request.GET.get('page')
 		try:
 		    hosts = paginator.page(page)
@@ -299,47 +334,48 @@ def search_exact(request):
 
 @login_required
 @role_required('hostadmin')
-@csrf_exempt
-def edit_host(request):
-	hostgroups = HostGroup.objects.all()
-	apps = Application.objects.all()
+def edit_host(request,id):
+	host = Host.objects.get(pk=id)
 	if request.method == "GET":
+		hostgroups = HostGroup.objects.all()
+		envs = Environment.objects.all()
 		return render(request,'opsdb/host/edit_host.html',locals())
 	else:
-		hostgroup = request.POST.get('hostgroup','')
-		apps = request.POST.get('app','')
-		hosts = request.POST.get('hosts','').split(',')
-		hosts_obj = Host.objects.filter(id__in=hosts)
+		hostgroups = request.POST.getlist('hostgroups','')
+		env = request.POST.get('env','')
 		try:
-			hostgroup_obj = get_object_or_404(HostGroup,pk=hostgroup)
-			for host in hosts_obj:
-				hostgroup_obj.host_set.add(host) 
-			if apps:
-				app_obj = get_object_or_404(Application,pk=app)
-				for host in hosts_obj:
-					app_obj.host_set.add(host)
+			if hostgroups:
+				host.hostgroups = hostgroups
+			if env != host.environment:
+				host.environment = Environment.objects.get(pk=env)
+				host.save()
+			messages.success(request, '主机更新成功')
+		except Exception as e:
+			messages.error(request, e)
+		return redirect('opsdb:hosts')
+
+@login_required
+@role_required('hostadmin')
+@csrf_exempt
+def edit_host_batch(request):
+	if request.method == "GET":
+		hostgroups = HostGroup.objects.all()
+		envs = Environment.objects.all()
+		hosts = Host.objects.all()
+		return render(request,'opsdb/host/edit_host_batch.html',locals())
+	else:
+		hostgroups = request.POST.getlist('hostgroups','')
+		env = request.POST.get('env','')
+		host_ids = request.POST.getlist('hosts','')
+		hosts = Host.objects.filter(pk__in=host_ids)
+		try:
+			hosts.update(environment_id=env)
+			for host in hosts:
+				host.hostgroups = hostgroups
 			messages.success(request, '更新成功')
 		except Exception as e:
 			messages.error(request, e)
-		return render(request,'opsdb/host/edit_host.html',locals())
-
-def get_obj(request):
-    val = request.GET.get('val','')
-    obj_type = request.GET.get('type','')
-    result = {}
-    if obj_type == 'env':
-        env = Environment.objects.get(name=val)
-        businesses = env.business_set.all()
-        for business in businesses:
-            result[business.name] = business.name
-    elif obj_type == 'business':
-        business = Business.objects.get(name=val)
-        apps = business.application_set.all()
-        for app in apps:
-            result[app.name] = app.name
-    else:
-        result = {'-1':'Nothing'}
-    return HttpResponse(json.dumps(result))
+		return redirect('opsdb:hosts')
 
 @login_required
 @role_required('hostadmin')
@@ -347,7 +383,7 @@ def hostgroups(request):
 	group_lists = HostGroup.objects.all()
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	hostgroups,page_number = paginator(group_lists,page,page_number)
+	paginator,hostgroups,page_number = my_paginator(group_lists,page,page_number)
 	return render(request,'opsdb/host/hostgroups.html',locals())
 
 @login_required

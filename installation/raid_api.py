@@ -11,7 +11,7 @@
 #    5、创建raid (create_raid)
 #    6、删除raid (delete_raid)
 
-from ops.sshapi import remote_cmd
+from xbox.sshapi import remote_cmd
 from .models import Disk
 import re
 

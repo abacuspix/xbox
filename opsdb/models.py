@@ -82,7 +82,7 @@ class Host(models.Model):
 	comment       = models.CharField(max_length=200,blank=True,null=True)
 	hostgroups    = models.ManyToManyField(HostGroup)
 	applications  = models.ManyToManyField(Application)
-	environment   = models.ManyToManyField(Environment)
+	environment   = models.ForeignKey(Environment,blank=True, null=True,on_delete=models.PROTECT)
 	create_time   = models.DateTimeField(auto_now_add=True)
 	update_time   = models.DateTimeField(auto_now=True)
 
@@ -110,5 +110,41 @@ def create_or_update_group_rule(sender, instance, created, **kwargs):
 	if created:
 		Rule.objects.create(group=instance)
 	instance.rule.save()
+
+class Idc(models.Model):
+    name               = models.CharField(max_length=100,blank=True,null=True)
+    address            = models.CharField(max_length=100,blank=True,null=True)
+    comment            = models.TextField(max_length=200,blank=True,default='')
+
+    class Meta:
+        db_table = 'idc'
+
+    def __unicode__(self):
+        return self.name
+
+class Cabinet(models.Model): 
+    sn                 = models.CharField(max_length=100,blank=True,null=True)
+    location           = models.CharField(max_length=100,blank=True,null=True)
+    size               = models.IntegerField(blank=True,null=True)
+    idc                = models.ForeignKey(Idc,blank=True, null=True,on_delete=models.PROTECT)
+    comment            = models.TextField(max_length=200,blank=True,default='')
+    class Meta:
+        db_table = 'cabinet'
+
+    def __unicode__(self):
+        return self.sn
+
+class Contacter(models.Model):
+    name               = models.CharField(max_length=30,blank=True,null=True)
+    phone              = models.CharField(max_length=30,blank=True,null=True)
+    email              = models.EmailField(blank=True,null=True)
+    dept               = models.CharField(max_length=30,blank=True,null=True)
+    company            = models.CharField(max_length=30,blank=True,null=True)
+
+    class Meta:
+        db_table = 'contacter'
+
+    def __unicode__(self):
+        return self.name
 
 

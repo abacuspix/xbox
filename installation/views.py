@@ -9,13 +9,13 @@ from django.contrib import messages
 from .models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
-from ops.sshapi import remote_cmd
+from xbox.sshapi import remote_cmd
 from .raid_api import RAIDAPI
-from ops.ipmi_api import ipmitool
+from .ipmi_api import ipmitool
 from .cobbler_api import CobblerAPI
 from .jobs import get_info_from_vcenter,chassis_off,chassis_install,boot_to_pxe
 from django.contrib.auth.decorators import login_required
-from users.custom_decorators import role_required
+from xbox.decorators import role_required
 
 # Create your views here.
 @csrf_exempt

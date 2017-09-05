@@ -10,7 +10,7 @@ from django.contrib.auth.models import User,Group
 from opsdb.models import Role
 from django.contrib import auth
 from .decorators import role_required
-from .paginator import paginator
+from .paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
@@ -109,7 +109,7 @@ def users(request):
 	user_list = User.objects.all()
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	users,page_number = paginator(user_list,page,page_number)
+	paginator,users,page_number = my_paginator(user_list,page,page_number)
 	return render(request,'users.html',locals())
 
 @login_required
@@ -246,7 +246,7 @@ def groups(request):
 	group_list = Group.objects.all()
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	groups,page_number = paginator(group_list,page,page_number)
+	paginator,groups,page_number = my_paginator(group_list,page,page_number)
 	return render(request, 'groups.html',locals())
 
 @login_required

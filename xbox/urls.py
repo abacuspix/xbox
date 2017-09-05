@@ -41,4 +41,5 @@ urlpatterns = [
     url(r'^audit/',include('audit.urls',namespace='audit')),
     url(r'^opsdb/',include('opsdb.urls',namespace='opsdb')),
     url(r'^django-rq/', include('django_rq.urls')),
+    url(r'^installation/', include('installation.urls',namespace='installation')),
 ]

@@ -138,11 +138,8 @@
                                   <td id="{{hostgroup.id}}"><small>{{hostgroup.name}}</small></td>
                                   <td><small><a href="">{{hostgroup.host_set.count}}</a></small></td>
                                   <td><small data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="{{hostgroup.comment}}">{{hostgroup.comment | truncatewords:5}}</small></td>
-                                  <td style="width: 86px;">
-                                    <small>
-                                      <button><a href="{% url 'opsdb:edit_hostgroup' hostgroup.id %}">编辑</a></button>
-                                    </small>
-                                  </td>
+                                  <td style="width: 50px;"><small>
+                                    <button class="btn btn-primary btn-xs"><a href="{% url 'opsdb:edit_hostgroup' hostgroup.id %}"><i class="icon-pencil"></i></a></button></small></td>
                                 </tr>
                               {% endfor %}
                             </tbody>

@@ -78,6 +78,9 @@
               <div class="tab-content">
                   <div class="tab-pane active">
                         <div class="mail-option">
+                              <div class="btn-group">
+                                <button type="button" class="btn label label-inverse" onclick="window.location.reload()"><i class="icon-refresh"></i> 刷新</button>
+                              </div>
                                <ul class="unstyled inbox-pagination">
                                    <li>
                                     <span class="pages">合计:{{ paginator.count }}&nbsp</span>
@@ -133,7 +136,8 @@
                                     </td>
                                     <td><small>{{rule.created_by.username}}</small></td>
                                     <td><small>{{rule.comment}}</small></td>
-                                    <td style="width: 86px;"><small><button><a href="{% url 'opsdb:edit_rule' rule.id %}">编辑</a></button></small></td>
+                                    <td style="width: 50px;"><small>
+                                    <button class="btn btn-primary btn-xs"><a href="{% url 'opsdb:edit_rule' rule.id %}"><i class="icon-pencil"></i></a></button></small></td>
                                   </tr>
                                 {% endfor %}
                               </tbody>

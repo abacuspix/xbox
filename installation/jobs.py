@@ -7,7 +7,7 @@ from .models import Vcenter,Datastore,Datacenter,Cluster,Host,Guest,Vnet,Server,
 from .getvmsbycluster import get_vms_by_cluster
 from .getdatastorebyname import get_ds_from_vcenter
 from .clone_vm import create_vm_by_template
-from ops.ipmi_api import ipmitool
+from .ipmi_api import ipmitool
 from django.shortcuts import get_object_or_404
 from django_rq import job
 
