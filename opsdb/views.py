@@ -10,13 +10,15 @@ from xbox.paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
-from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD
+from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS
 from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
 from json2html import *
 from django.db.models import Q
 import time
+from .utils import exacute_cmd,upload_file,tansimit_file
+import os
 # Create your views here.
 
 @login_required
@@ -181,7 +183,6 @@ def host(request,id):
 	grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
 	if hosts:
 		for host in hosts:
-			print host['_stamp'],'==============='
 			ret = host.get('return',None)
 			# operation system info
 			grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
@@ -321,19 +322,19 @@ def search_exact(request):
 						host_list.extend(hostgroup.host_set.filter(q,is_delete=False)).distinct()
 		page_number =  request.GET.get('page_number')
 		if page_number:
-		    page_number = int(page_number)
+			page_number = int(page_number)
 		else:
-		    page_number =  10
+			page_number =  10
 		paginator = my_paginator(host_list, page_number)
 		page = request.GET.get('page')
 		try:
-		    hosts = paginator.page(page)
+			hosts = paginator.page(page)
 		except PageNotAnInteger:
-		    # If page is not an integer, deliver first page.
-		    hosts = paginator.page(1)
+			# If page is not an integer, deliver first page.
+			hosts = paginator.page(1)
 		except EmptyPage:
-		    # If page is out of range (e.g. 9999), deliver last page of results.
-		    hosts = paginator.page(paginator.num_pages)
+			# If page is out of range (e.g. 9999), deliver last page of results.
+			hosts = paginator.page(paginator.num_pages)
 		return render(request,'opsdb/host/hosts.html',locals())
 
 @login_required
@@ -456,18 +457,10 @@ def cmd(request):
 			client =  request.META['HTTP_X_FORWARDED_FOR']  
 		else:
 			client = request.META['REMOTE_ADDR']
-		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
-		try:
-			arg_list = request.POST.get('cmd','') if request.POST.get('cmd','') else []
-			hosts = request.POST.get('hosts','')
-			target = hosts.split(',')
-			result = salt.run(fun='cmd.run',target=target,arg_list=arg_list)
-			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
-			'target':target,'fun':'cmd.run','arg':arg_list,\
-			'status':'','progress':'Finish','result':result,'cjid':str(int(round(time.time() * 1000)))}
-			MONGO_CLIENT.salt.joblist.insert_one(job)
-		except Exception as e:
-			error = str(e)
+		arg_list = request.POST.get('cmd','') if request.POST.get('cmd','') else 'echo hello'
+		hosts = request.POST.get('hosts','')
+		target = hosts.split(',')
+		result,error = exacute_cmd(user,client,target,arg_list)
 	return render(request, 'opsdb/ops/cmd.html',locals())	
 
 
@@ -486,3 +479,165 @@ def select_hosts(request):
 	page = request.GET.get('page')
 	paginator,hosts,page_number = my_paginator(host_list,page,page_number)
 	return render(request,'opsdb/ops/select_hosts.html',locals())
+
+def search_host_for_cmd(request):
+	keyword = request.POST.get('keyword','')
+	q = Q(ip__icontains=keyword) | Q(hostname__icontains=keyword) | Q(os__icontains=keyword) \
+	| Q(hostgroups__name__icontains=keyword) | Q(applications__name__icontains=keyword) \
+	| Q(is_virtual__icontains=keyword) | Q(environment__name__icontains=keyword)| Q(comment__icontains=keyword) \
+	| Q(minion_id__icontains=keyword) 
+	if request.user.is_superuser:
+		host_list = Host.objects.select_related().filter(q).distinct()
+	else:
+		if request.user.groups:
+			host_list = []
+			for group in request.user.groups.all():
+				for hostgroup in group.rule.hostgroups.all():
+					host_list.extend(hostgroup.host_set.filter(q).distinct())
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,hosts,page_number = my_paginator(host_list,page,page_number)
+	return render(request,'opsdb/ops/select_hosts.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def joblist(request):
+	if request.user.is_superuser:
+		sjobs = MONGO_CLIENT.salt.joblist.find().sort([('_id',-1)])
+	else:
+		sjobs = MONGO_CLIENT.salt.joblist.find({'user':request.user.username}).sort([('_id',-1)])
+	job_list = [job for job in sjobs]
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,jobs,page_number = my_paginator(job_list,page,page_number)
+	return render(request,'opsdb/ops/joblist.html',locals())
+
+def job_cjid(request,cjid):
+	sjob = MONGO_CLIENT.salt.joblist.find_one({'cjid':cjid})
+	return render(request,'opsdb/ops/jobresult.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def cmds(request):
+	cmd_list = Cmd.objects.all()
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,cmds,page_number = my_paginator(cmd_list,page,page_number)
+	return render(request,'opsdb/ops/cmds.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def add_cmd(request):
+	if request.method == 'POST':
+		name = request.POST.get('name','')
+		argument = request.POST.get('argument','')
+		comment = request.POST.get('comment')
+		try:
+			cmd,created = Cmd.objects.get_or_create(name=name,defaults={'argument':argument,'comment':comment,'created_by':request.user.username})
+			if created:
+				messages.success(request, '命令添加成功')
+				return redirect('opsdb:cmds')
+			else:
+				messages.error(request, '命令名称重复')
+		except Exception as e:
+			messages.error(request, e)
+	return render(request,'opsdb/ops/add_cmd.html',locals())
+
+@login_required
+@role_required('hostadmin')
+@csrf_exempt
+def save_cmd(request):
+	if request.method == 'POST':
+		argument = request.POST.get('argument','')
+	return render(request,'opsdb/ops/add_cmd.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def edit_cmd(request,id):
+	cmd = Cmd.objects.get(pk=id)
+	if request.method == 'POST':
+		name = request.POST.get('name','')
+		argument = request.POST.get('argument','')
+		comment = request.POST.get('comment')
+		try:
+			if name != cmd.name:
+				cmd.name = name
+			if argument != cmd.argument:
+				cmd.argument = argument
+			if comment != cmd.comment:
+				cmd.comment = comment
+			cmd.save()
+			messages.success(request, '命令更新成功')
+			return redirect('opsdb:cmds')
+		except Exception as e:
+			messages.error(request, e)
+	else:
+		name,argument,comment = cmd.name,cmd.argument,cmd.comment
+	return render(request,'opsdb/ops/edit_cmd.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def delete_cmd(request,id):
+	ret = 'success'
+	try:
+		Cmd.objects.filter(pk__in=id).delete()
+		messages.success(request, '命令已经删除')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:cmds')
+
+@login_required
+@role_required('hostadmin')
+@csrf_exempt
+def delete_cmds(request):
+	ids = request.POST.getlist('ids[]','')
+	ret = 'success'
+	try:
+		Cmd.objects.filter(pk__in=ids).delete()
+	except Exception as e:
+		ret = str(e)
+	return HttpResponse(ret)
+
+@login_required
+@role_required('hostadmin')
+def get_file(request):
+	files = os.listdir(SALT_FILE_ROOTS)
+	if request.method == 'POST':
+		file = request.POST.get('file','')
+		remote_path = request.POST.get('remote_path','')
+		arg_list = [file,remote_path,'makedirs=True']
+		target = request.POST.get('hosts','').split(',')
+		user = request.user.username
+		if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+			client =  request.META['HTTP_X_FORWARDED_FOR']  
+		else:
+			client = request.META['REMOTE_ADDR']
+		result,error = tansimit_file(user,client,target,arg_list)
+	return render(request,'opsdb/ops/get_file.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def put_file(request):
+	if request.method == 'POST':
+		file = request.FILES.get("myfile", None)
+		if not file:  
+			messages.error(request, 'No files for upload!')
+		else:
+			user = request.user.username
+			if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+				client =  request.META['HTTP_X_FORWARDED_FOR']  
+			else:
+				client = request.META['REMOTE_ADDR']
+			result,error = upload_file(user,client,SALT_FILE_ROOTS,file)
+			if result:
+				messages.success(request, '文件上传成功')
+			else:
+				messages.error(request, error)
+	return render(request,'opsdb/ops/put_file.html',locals())
+
+
+
+
+
+
+

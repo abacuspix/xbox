@@ -147,4 +147,16 @@ class Contacter(models.Model):
     def __unicode__(self):
         return self.name
 
+class Cmd(models.Model):
+    name               = models.CharField(unique=True,max_length=100)
+    argument           = models.CharField(max_length=200,blank=True,null=True)
+    created_by         = models.CharField(max_length=80,blank=True,null=True)
+    comment            = models.CharField(max_length=200,blank=True,null=True)
+
+    class Meta:
+        db_table = 'command'
+
+    def __unicode__(self):
+        return self.name	
+		
 

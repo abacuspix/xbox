@@ -161,6 +161,7 @@ SALT_IP = '192.168.3.169'
 SALT_PORT = '8080'
 SALT_USER = 'salt_api'
 SALT_PASSWD = 'salt_api'
+SALT_FILE_ROOTS = '/srv/salt/files'
 MONGO_IP = '192.168.3.169'
 MONGO_PORT = '27017'
 from pymongo import MongoClient

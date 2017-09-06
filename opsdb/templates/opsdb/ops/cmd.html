@@ -43,26 +43,26 @@
         <!-- page start-->
         <section class="panel">
             <div class="panel-body">
-              <div class="col-lg-10 col-sm-10" style="height: 30px;">
-                <form class="form-horizontal search-result" action="{% url 'opsdb:cmd' %}" method="POST">
+              <div class="col-lg-9 col-sm-9" style="height: 30px;">
+                <form class="form-horizontal" role="form" action="{% url 'opsdb:cmd' %}" method="POST" id="exactue_cmd">
                 {% csrf_token %}
-                    <div class="form-group row">
+                    <div class="form-group">
                         <label class="col-lg-1 col-sm-1 control-label">命令</label>
-                        <div class="col-lg-10 col-sm-10">
-                            <input type="text" class="form-control input-sm m-bot15" name="cmd" value="{{arg_list}}">
-                            <input type="hidden" class="form-control input-xxlarge" name="hosts" id="hosts" value="{{hosts}}">
-                        </div>
-                        <div class="col-lg-1 col-sm-1">
-                            <button class="btn btn-info btn-sm" type="submit"><i class="icon-play"></i> 执行</button>
+                        <div class="col-lg-11 col-sm-11">
+                            <input type="text" class="form-control input-sm " name="cmd" value="{{arg_list}}" required="required" placeholder="echo hello" id="cmd">
+                            <input type="hidden" class="form-control" name="hosts" id="hosts" value="{{hosts}}">
                         </div>
                     </div>
                 </form>
               </div>
               <div class="col-lg-1 col-sm-1">
+                  <button class="btn btn-info btn-sm" onclick="exactue_cmd()"><i class="icon-play"></i> 执行</button>
+              </div>
+              <div class="col-lg-1 col-sm-1" style="right: 10px;">
                   <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 主机</button>
               </div> 
-              <div class="col-lg-1 col-sm-1" style="right: 10px;">
-                  <button class="btn btn-sm"><i class="icon-save"></i> 保存命令</button>
+              <div class="col-lg-1 col-sm-1" style="right: 20px;">
+                  <button class="btn btn-sm" onclick="save_cmd()"><i class="icon-save"></i> 保存命令</button>
               </div>                
             </div>
         </section>
@@ -101,10 +101,47 @@
             type: 2,
             shift: 1,
             title: '选择主机',
-            // area : ['800px','500px'],
             area : ['80%','80%'],
             content: "{% url 'opsdb:select_hosts' %}"
           });
+    }
+
+    function exactue_cmd(){
+      var hosts = $('#hosts').val();
+      if (hosts.length == 0)
+        { 
+          layer.msg('请先选中主机', {icon: 0});
+        }
+      else
+        {
+          document.getElementById("exactue_cmd").submit();
+        }
+    }
+
+    function save_cmd(){
+      var cmd = $('#cmd').val();
+      if (cmd.length == 0)
+        { 
+          layer.msg('命令为空', {icon: 2});
+        }
+      else
+        {
+          var index = layer.open({
+              type: 2,
+              // offset: 'r',
+              area: ['80%','50%'],
+              title: '保存为常用命令',
+              content: "{% url 'opsdb:add_cmd' %}",
+              success: function(layero, index){
+                  var body = layer.getChildFrame('body',index);//建立父子联系
+                  var iframeWin = window[layero.find('iframe')[0]['name']];
+                  // console.log(arr); //得到iframe页的body内容
+                  console.log(body.find('input'));
+                  var inputList = body.find('input');
+                  $(inputList[1]).val(cmd);
+              }
+            });
+        }
     }
     </script>
   </body>
