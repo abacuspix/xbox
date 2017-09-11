@@ -102,4 +102,5 @@ db.sqlite3
 #settings.py
 collectedstatic
 nohup.out
-.log.*
+.log
+logs/
