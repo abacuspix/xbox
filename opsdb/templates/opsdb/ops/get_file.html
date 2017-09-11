@@ -68,14 +68,14 @@
           <header class="panel-heading tab-bg-dark-navy-blue ">
               <ul class="nav nav-tabs">
                   <li class="active">
-                      <a href="{% url 'opsdb:hosts' %}" style="left: 15px;">文件分发</a>
+                      <a href="{% url 'opsdb:get_file' %}" style="left: 15px;">文件分发</a>
                   </li>
                   <li class="">
-                      <a href="{% url 'opsdb:hostgroups' %}" style="left: 15px;">文件下载</a>
+                      <a href="{% url 'opsdb:push_file' %}" style="left: 15px;">文件下载</a>
                   </li>
               </ul>
           </header>
-          <section class="panel">
+          <section class="panel" style="margin-bottom: -10px;">
             <div class="panel-body">
               <div class="col-lg-10 col-sm-10" style="height: 30px;">
                 <form class="form-horizontal" role="form" action="{% url 'opsdb:get_file' %}" method="POST" id="get_file">
@@ -101,24 +101,24 @@
                 </form>
               </div>
               <div class="col-lg-1 col-sm-1" style="right: 10px;">
-                  <button class="btn btn-info btn-sm" onclick="get_file()"><i class="icon-cloud-upload"></i> 开始上传</button>
-              </div>
-              <div class="col-lg-1 col-sm-1">
                   <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 主机</button>
-              </div>                 
+              </div>   
+              <div class="col-lg-1 col-sm-1" style="right: 20px;">
+                  <button class="btn btn-info btn-sm" onclick="get_file()"><i class="icon-cloud-upload"></i> 开始上传</button>
+              </div>              
             </div>
         </section>
         <section class="panel">
             <div class="panel-body">
             {% if result %}
               {% for minion,return in result.items %}
-              <div class="col-lg-12 col-sm-12" style="height: 100%;">
+              <div class="col-lg-12 col-sm-12" style="min-height: 400px;">
                 <b>{{minion}}:</b>
                 <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;;height:100%;">{{return}}</pre>
               </div>
               {% endfor %}
             {% else %}
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;;height:100%;">{{error}}</pre>
+                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">{{error}}</pre>
             {% endif %}
             </div>
         </section>

@@ -43,7 +43,7 @@
         <!-- page start-->
         <section class="panel">
             <div class="panel-body">
-              <div class="col-lg-9 col-sm-9" style="height: 30px;">
+              <div class="col-lg-10 col-sm-10" style="height: 30px;">
                 <form class="form-horizontal" role="form" action="{% url 'opsdb:cmd' %}" method="POST" id="exactue_cmd">
                 {% csrf_token %}
                     <div class="form-group">
@@ -55,19 +55,20 @@
                     </div>
                 </form>
               </div>
+              
               <div class="col-lg-1 col-sm-1">
-                  <button class="btn btn-info btn-sm" onclick="exactue_cmd()"><i class="icon-play"></i> 执行</button>
-              </div>
-              <div class="col-lg-1 col-sm-1" style="right: 10px;">
                   <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 主机</button>
               </div> 
-              <div class="col-lg-1 col-sm-1" style="right: 20px;">
+              <div class="col-lg-1 col-sm-1" style="right: 10px;">
+                  <button class="btn btn-info btn-sm" onclick="exactue_cmd()"><i class="icon-play"></i> 执行</button>
+              </div>
+              <!-- <div class="col-lg-1 col-sm-1" style="right: 20px;">
                   <button class="btn btn-sm" onclick="save_cmd()"><i class="icon-save"></i> 保存命令</button>
-              </div>                
+              </div>   -->              
             </div>
         </section>
         <section class="panel">
-            <div class="panel-body">
+            <div class="panel-body" style="min-height: 450px;">
             {% if result %}
               {% for minion,return in result.items %}
               <div class="col-lg-12 col-sm-12" style="height: 100%;">
@@ -76,7 +77,7 @@
               </div>
               {% endfor %}
             {% else %}
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;;height:100%;">{{error}}</pre>
+                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">{{error}}</pre>
             {% endif %}
             </div>
         </section>

@@ -23,7 +23,7 @@ def exacute_cmd(user,client,target,arg_list):
 		error = str(e)
 	return result,error
 
-def tansimit_file(user,client,target,arg_list):
+def push_file_to_minion(user,client,target,arg_list):
 	result = {}
 	error = ''
 	try:
@@ -31,7 +31,7 @@ def tansimit_file(user,client,target,arg_list):
 		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
 		result = salt.run(fun='cp.get_file',target=target,arg_list=arg_list)
 		job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
-		'target':target,'fun':'cp.get_file','arg':arg_list,\
+		'target':target,'fun':'push file to minion','arg':arg_list,\
 		'status':'','progress':'Finish','result':result,'cjid':str(int(round(time.time() * 1000)))}
 		MONGO_CLIENT.salt.joblist.insert_one(job)
 	except Exception as e:
@@ -55,4 +55,36 @@ def upload_file(user,client,destination,file):
 		error = str(e)
 	return result,error
 
+def get_file_from_minion(user,client,target,arg_list):
+	result = {}
+	error = ''
+	try:
+		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
+		result = salt.run(fun='cp.push',target=target,arg_list=arg_list)
+		job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+		'target':target,'fun':'get file from minion','arg':arg_list,\
+		'status':'','progress':'Finish','result':result,'cjid':str(int(round(time.time() * 1000)))}
+		MONGO_CLIENT.salt.joblist.insert_one(job)
+	except Exception as e:
+		error = str(e)
+	return result,error
 
+def run_script(user,client,target,arg_list,async):
+	result = {}
+	error = ''
+	try:
+		arg_list = 'salt://scripts/' + arg_list
+		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
+		if async:
+			result = salt.run_async(fun='cmd.script',target=target,arg_list=arg_list)
+			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+			'target':target,'fun':'cmd.script','arg':arg_list,'progress':'','jid':result['jid']}
+		else:
+			result = salt.run(fun='cmd.script',target=target,arg_list=arg_list)
+			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+			'target':target,'fun':'cmd.script','arg':arg_list,\
+			'status':'','progress':'Finish','result':result,'cjid':str(int(round(time.time() * 1000)))}
+		MONGO_CLIENT.salt.joblist.insert_one(job)
+	except Exception as e:
+		error = str(e)
+	return result,error

@@ -10,14 +10,14 @@ from xbox.paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
-from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS
+from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS,SALT_SCRIPTS
 from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
 from json2html import *
 from django.db.models import Q
 import time
-from .utils import exacute_cmd,upload_file,tansimit_file
+from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_minion,run_script
 import os
 # Create your views here.
 
@@ -108,7 +108,9 @@ def edit_rule(request,id):
 @csrf_exempt
 def add_host(request):
 	if request.method == "GET":
-		return render(request,'opsdb/host/add_host.html')
+		hostgroups = HostGroup.objects.all()
+		envs = Environment.objects.all()
+		return render(request,'opsdb/host/add_host.html',locals())
 	else:
 		ip = request.POST.get('ip','')
 		port = request.POST.get('port','')
@@ -514,6 +516,11 @@ def joblist(request):
 
 def job_cjid(request,cjid):
 	sjob = MONGO_CLIENT.salt.joblist.find_one({'cjid':cjid})
+	if sjob.has_key('fun') and sjob['fun'] == 'cmd.script':
+		result = {}
+		for minion,ret in sjob['result'].items():
+			result[minion] = {'stderr':ret['stderr'],'stdout':ret['stdout']}
+		return render(request,'opsdb/ops/show_job_result.html',locals())
 	return render(request,'opsdb/ops/jobresult.html',locals())
 
 @login_required
@@ -612,7 +619,7 @@ def get_file(request):
 			client =  request.META['HTTP_X_FORWARDED_FOR']  
 		else:
 			client = request.META['REMOTE_ADDR']
-		result,error = tansimit_file(user,client,target,arg_list)
+		result,error = push_file_to_minion(user,client,target,arg_list)
 	return render(request,'opsdb/ops/get_file.html',locals())
 
 @login_required
@@ -635,9 +642,200 @@ def put_file(request):
 				messages.error(request, error)
 	return render(request,'opsdb/ops/put_file.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def push_file(request):
+	if request.method == 'POST':
+		remote_path = request.POST.get('remote_path','')
+		arg_list = [remote_path]
+		target = request.POST.get('hosts','').split(',')
+		user = request.user.username
+		if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+			client =  request.META['HTTP_X_FORWARDED_FOR']  
+		else:
+			client = request.META['REMOTE_ADDR']
+		result,error = get_file_from_minion(user,client,target,arg_list)
+	return render(request,'opsdb/ops/push_file.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def scripts(request):
+	script_list = Script.objects.all()
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,scripts,page_number = my_paginator(script_list,page,page_number)
+	return render(request,'opsdb/ops/scripts.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def upload_script(request):
+	if request.method == 'POST':
+		file = request.FILES.get("myfile", None)
+		if not file:  
+			messages.error(request, 'No files for upload!')
+		else:
+			name = request.POST.get('name') if request.POST.get('name') else file.name
+			try:
+				user = request.user.username
+				script = Script.objects.create(name=name,script_name=file.name,created_by=user)
+				if script:
+					if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+						client =  request.META['HTTP_X_FORWARDED_FOR']  
+					else:
+						client = request.META['REMOTE_ADDR']
+					result,error = upload_file(user,client,SALT_SCRIPTS,file)
+					if not error:
+						messages.success(request, '脚本上传成功')
+					else:
+						messages.error(request, error)
+						script.delete()
+			except Exception as e:
+				messages.error(request, e)
+	return render(request,'opsdb/ops/upload_script.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def edit_script(request,id):
+	try:
+		script = Script.objects.get(pk=id)
+		file_path = os.path.join(SALT_SCRIPTS,script.script_name)
+		if request.method == 'POST':
+			script_name = request.POST.get('script_name')
+			name = request.POST.get('name')
+			file = request.POST.get('script')
+			f = open(file_path,'w')
+			f.write(file)
+			f.close()
+			script.comment = request.user.username
+			script.script_name = script_name
+			script.name = name
+			script.save()
+			messages.success(request, '保存成功')
+		else:
+			script_name = script.script_name
+			name = script.name
+		f = open(file_path,'r')
+		file = f.read()
+		f.close()
+	except Exception as e:
+		messages.error(request, e)
+	return render(request,'opsdb/ops/edit_script.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def add_script(request):
+	if request.method == "POST":
+		try:
+			script_name = request.POST.get('script_name')
+			name = request.POST.get('name') if request.POST.get('name','') else script_name
+			file = request.POST.get('script')
+			file_path = os.path.join(SALT_SCRIPTS,script_name)
+			script = Script.objects.create(name=name,script_name=script_name,created_by=request.user.username,comment=request.user.username)
+			if script:
+				try:
+					f = open(file_path,'w')
+					f.write(file)
+					f.close()
+					messages.success(request, '保存成功')
+					f = open(file_path,'r')
+					file = f.read()
+					f.close()
+				except Exception as e:
+					script.delete()
+					messages.error(request, e)		
+		except Exception as e:
+			messages.error(request, e)
+	return render(request,'opsdb/ops/add_script.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def copy_script(request,id):
+	try:
+		script = Script.objects.get(pk=id)
+		file_path = os.path.join(SALT_SCRIPTS,script.script_name)
+		if request.method == 'POST':
+			script_name = request.POST.get('script_name')
+			name = request.POST.get('name')
+			file = request.POST.get('script')
+			new_script = Script.objects.create(name=name,script_name=script_name,created_by=request.user.username,comment=request.user.username)
+			if new_script:
+				try:
+					file_path = os.path.join(SALT_SCRIPTS,script_name)
+					f = open(file_path,'w')
+					f.write(file)
+					f.close()
+					messages.success(request, '复制成功')
+				except Exception as e:
+					new_script.delete()
+					messages.error(request, e)		
+		else:
+			old_script_name = script.script_name.split('.')
+			script_name = '.'.join([old_script_name[0] + '-copy',old_script_name[1]])
+			name = script.name + '-copy'
+		f = open(file_path,'r')
+		file = f.read()
+		f.close()
+	except Exception as e:
+		messages.error(request, e)
+	return render(request,'opsdb/ops/copy_script.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def delete_script(request,id):
+	try:
+		script = Script.objects.get(pk=id)
+		if script:
+			file_path = os.path.join(SALT_SCRIPTS,script.script_name)
+			os.remove(file_path)
+			script.delete()
+			messages.success(request, '脚本已经删除')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:scripts')
+
+@login_required
+@role_required('hostadmin')
+def exacute_script(request,id):
+	try:
+		script = Script.objects.get(pk=id)
+		if request.method == 'POST':
+			arg_list = script.script_name
+			hosts = request.POST.get('hosts')
+			target = hosts.split(',')
+			async = request.POST.get('async')
+			if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+				client =  request.META['HTTP_X_FORWARDED_FOR']  
+			else:
+				client = request.META['REMOTE_ADDR']
+			user = request.user.username
+			result,error = run_script(user,client,target,arg_list,async)
+			if error:
+				messages.error(request, error)
+	except Exception as e:
+		messages.error(request, e)
+	return render(request,'opsdb/ops/exacute_script.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def search_script(request):
+	keyword = request.POST.get('keyword','')
+	q = Q(name__icontains=keyword) | Q(script_name__icontains=keyword) | Q(created_by__icontains=keyword) \
+	| Q(comment__icontains=keyword)
+	script_list = Script.objects.filter(q)
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,scripts,page_number = my_paginator(script_list,page,page_number)
+	return render(request,'opsdb/ops/scripts.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def job_jid(request,jid):
+	jobs = MONGO_CLIENT.salt.salt_job_ret.find({'jid':jid})
+	result = {}
+	if jobs:
+		for job in jobs:
+			result[job['id']] = {'stderr':job['return']['stderr'],'stdout':job['return']['stdout']}
+	else:
+		error = '抱歉,未查询到结果,请稍后再试.'
+	return render(request,'opsdb/ops/show_job_result.html',locals())
 

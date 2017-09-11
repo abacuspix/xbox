@@ -42,18 +42,18 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 	instance.profile.save()
 
 class Environment(models.Model):
-    name               = models.CharField(max_length=100,blank=True,null=True)
-    comment            = models.TextField(max_length=200,blank=True)
-    class Meta:
-        db_table = 'environment'
+	name           = models.CharField(max_length=100,blank=True,null=True)
+	comment        = models.TextField(max_length=200,blank=True)
+	class Meta:
+		db_table = 'environment'
 
-    def __unicode__(self):
-        return self.name
+	def __unicode__(self):
+		return self.name
 
 
 class Application(models.Model):
-	name               = models.CharField(max_length=50,blank=True,null=True)
-	comment            = models.TextField(max_length=200,blank=True)
+	name           = models.CharField(max_length=50,blank=True,null=True)
+	comment        = models.TextField(max_length=200,blank=True)
 
 	class Meta:
 		db_table = 'application'
@@ -62,8 +62,8 @@ class Application(models.Model):
 		return self.name
 
 class HostGroup(models.Model):
-	name               = models.CharField(max_length=50,blank=True,null=True)
-	comment            = models.TextField(max_length=200,blank=True)
+	name           = models.CharField(max_length=50,blank=True,null=True)
+	comment        = models.TextField(max_length=200,blank=True)
 
 	class Meta:
 		db_table = 'hostgroup'
@@ -112,51 +112,65 @@ def create_or_update_group_rule(sender, instance, created, **kwargs):
 	instance.rule.save()
 
 class Idc(models.Model):
-    name               = models.CharField(max_length=100,blank=True,null=True)
-    address            = models.CharField(max_length=100,blank=True,null=True)
-    comment            = models.TextField(max_length=200,blank=True,default='')
+	name               = models.CharField(max_length=100,blank=True,null=True)
+	address            = models.CharField(max_length=100,blank=True,null=True)
+	comment            = models.TextField(max_length=200,blank=True,default='')
 
-    class Meta:
-        db_table = 'idc'
+	class Meta:
+		db_table = 'idc'
 
-    def __unicode__(self):
-        return self.name
+	def __unicode__(self):
+		return self.name
 
 class Cabinet(models.Model): 
-    sn                 = models.CharField(max_length=100,blank=True,null=True)
-    location           = models.CharField(max_length=100,blank=True,null=True)
-    size               = models.IntegerField(blank=True,null=True)
-    idc                = models.ForeignKey(Idc,blank=True, null=True,on_delete=models.PROTECT)
-    comment            = models.TextField(max_length=200,blank=True,default='')
-    class Meta:
-        db_table = 'cabinet'
+	sn                 = models.CharField(max_length=100,blank=True,null=True)
+	location           = models.CharField(max_length=100,blank=True,null=True)
+	size               = models.IntegerField(blank=True,null=True)
+	idc                = models.ForeignKey(Idc,blank=True, null=True,on_delete=models.PROTECT)
+	comment            = models.TextField(max_length=200,blank=True,default='')
+	class Meta:
+		db_table = 'cabinet'
 
-    def __unicode__(self):
-        return self.sn
+	def __unicode__(self):
+		return self.sn
 
 class Contacter(models.Model):
-    name               = models.CharField(max_length=30,blank=True,null=True)
-    phone              = models.CharField(max_length=30,blank=True,null=True)
-    email              = models.EmailField(blank=True,null=True)
-    dept               = models.CharField(max_length=30,blank=True,null=True)
-    company            = models.CharField(max_length=30,blank=True,null=True)
+	name               = models.CharField(max_length=30,blank=True,null=True)
+	phone              = models.CharField(max_length=30,blank=True,null=True)
+	email              = models.EmailField(blank=True,null=True)
+	dept               = models.CharField(max_length=30,blank=True,null=True)
+	company            = models.CharField(max_length=30,blank=True,null=True)
 
-    class Meta:
-        db_table = 'contacter'
+	class Meta:
+		db_table = 'contacter'
 
-    def __unicode__(self):
-        return self.name
+	def __unicode__(self):
+		return self.name
 
 class Cmd(models.Model):
-    name               = models.CharField(unique=True,max_length=100)
-    argument           = models.CharField(max_length=200,blank=True,null=True)
-    created_by         = models.CharField(max_length=80,blank=True,null=True)
-    comment            = models.CharField(max_length=200,blank=True,null=True)
+	name               = models.CharField(unique=True,max_length=100)
+	argument           = models.CharField(max_length=200,blank=True,null=True)
+	created_by         = models.CharField(max_length=80,blank=True,null=True)
+	comment            = models.CharField(max_length=200,blank=True,null=True)
 
-    class Meta:
-        db_table = 'command'
+	class Meta:
+		db_table = 'command'
 
-    def __unicode__(self):
-        return self.name	
+	def __unicode__(self):
+		return self.name
+
+class Script(models.Model):
+	name               = models.CharField(unique=True,max_length=100)
+	script_name        = models.CharField(unique=True,max_length=100)
+	created_by         = models.CharField(max_length=80,blank=True,null=True)
+	comment            = models.CharField(max_length=200,blank=True,null=True)
+	create_time        = models.DateTimeField(auto_now_add=True)
+	update_time        = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'script'
+
+	def __unicode__(self):
+		return self.name		
 		
 

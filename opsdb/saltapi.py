@@ -49,12 +49,13 @@ class SaltAPI():
         ]
         return self.do_post()
 
-    def run_async(self, client='local_async', fun="cmd.run", target="*", arg_list=[]):
+    def run_async(self, client='local_async', fun="test.ping", target="*", arg_list=[],expr_form='list'):
         self.post_data = [
             {
                 "client": client,
-                "tgt": target,
                 "fun": fun,
+                "tgt": target,
+                "expr_form": expr_form,
                 "arg": arg_list
             }
         ]

@@ -1,0 +1,75 @@
+00:35:45 high: script_on_saltmaster.parse_salt_event({'tag': '20170907003545522058', 'data': {'_stamp': '2017-09-06T16:35:45.522300', 'minions': ['cobbler']}}) (f3c09b19-3c1b-4151-b003-823a1a24464c)
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 high: Job OK (f3c09b19-3c1b-4151-b003-823a1a24464c)
+00:35:45 Result is kept for 500 seconds
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 
+00:35:45 *** Listening on high, default, low...
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170907003545522058/new', 'data': {'tgt_type': 'list', 'jid': '20170907003545522058', 'tgt': ['cobbler'], '_stamp': '2017-09-06T16:35:45.522562', 'user': 'salt_api', 'arg': ['salt://files/test.sh', '/root/test.sh'], 'fun': 'cp.get_file', 'minions': ['cobbler']}}) (624fba1f-94ef-48f2-9378-a23d2e47f195)
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 high: Job OK (624fba1f-94ef-48f2-9378-a23d2e47f195)
+00:35:45 Result is kept for 500 seconds
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 
+00:35:45 *** Listening on high, default, low...
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170907003545522058/ret/cobbler', 'data': {'fun_args': ['salt://files/test.sh', '/root/test.sh'], 'jid': '20170907003545522058', 'return': '/root/test.sh', 'retcode': 0, 'success': True, 'cmd': '_return', '_stamp': '2017-09-06T16:35:45.569408', 'fun': 'cp.get_file', 'id': 'cobbler'}}) (7bb9b94d-62a1-44cb-84f1-6cd9979ebe74)
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 high: Job OK (7bb9b94d-62a1-44cb-84f1-6cd9979ebe74)
+00:35:45 Result is kept for 500 seconds
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:35:45 
+00:35:45 *** Listening on high, default, low...
+00:35:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:41:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:47:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:53:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+00:59:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:05:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:11:45 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: script_on_saltmaster.parse_salt_event({'tag': '20170907011310181829', 'data': {'_stamp': '2017-09-06T17:13:10.182088', 'minions': ['cobbler', 'prod']}}) (3eb71a17-413d-4b60-b247-9e1573155cf4)
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: Job OK (3eb71a17-413d-4b60-b247-9e1573155cf4)
+01:13:10 Result is kept for 500 seconds
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 Cleaning registries for queue: high
+01:13:10 Cleaning registries for queue: default
+01:13:10 Cleaning registries for queue: low
+01:13:10 
+01:13:10 *** Listening on high, default, low...
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170907011310181829/new', 'data': {'tgt_type': 'glob', 'jid': '20170907011310181829', 'tgt': '*', '_stamp': '2017-09-06T17:13:10.182349', 'user': 'root', 'arg': ['/etc/fstab', {'upload_path': '/root/fstab', '__kwarg__': True}], 'fun': 'cp.push', 'minions': ['cobbler', 'prod']}}) (d44b1dc4-dde0-41cd-ba40-8caf13d7f150)
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: Job OK (d44b1dc4-dde0-41cd-ba40-8caf13d7f150)
+01:13:10 Result is kept for 500 seconds
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 
+01:13:10 *** Listening on high, default, low...
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170907011310181829/ret/cobbler', 'data': {'fun_args': ['/etc/fstab', {'upload_path': '/root/fstab'}], 'jid': '20170907011310181829', 'return': False, 'retcode': 0, 'success': True, 'cmd': '_return', '_stamp': '2017-09-06T17:13:10.223481', 'fun': 'cp.push', 'id': 'cobbler'}}) (5b13d1f1-85b2-495c-8f39-fe2698df311f)
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: Job OK (5b13d1f1-85b2-495c-8f39-fe2698df311f)
+01:13:10 Result is kept for 500 seconds
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 
+01:13:10 *** Listening on high, default, low...
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: script_on_saltmaster.parse_salt_event({'tag': 'salt/job/20170907011310181829/ret/prod', 'data': {'fun_args': ['/etc/fstab', {'upload_path': '/root/fstab'}], 'jid': '20170907011310181829', 'return': False, 'retcode': 0, 'success': True, 'cmd': '_return', '_stamp': '2017-09-06T17:13:10.288568', 'fun': 'cp.push', 'id': 'prod'}}) (1691c3f4-7ae3-436b-9a04-9fe3fd2a5531)
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 high: Job OK (1691c3f4-7ae3-436b-9a04-9fe3fd2a5531)
+01:13:10 Result is kept for 500 seconds
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:13:10 
+01:13:10 *** Listening on high, default, low...
+01:13:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:19:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:25:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
+01:31:10 Sent heartbeat to prevent worker timeout. Next one should arrive within 420 seconds.
