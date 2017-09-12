@@ -98,7 +98,7 @@
 	                                <th><small>执行模块</small></th>
 	                                <th><small>命令参数</small></th>
 	                                <th><small>执行状态</small></th>
-	                                <th><small>结果</small></th>
+	                                <!-- <th><small>结果</small></th> -->
 	                                <th><small>详细报告</small></th>
 	                              </tr>
 	                        </thead>
@@ -117,7 +117,7 @@
 	                                {% else %}
 	                                <th><small>{{job.progress}}</small></th>
 	                               	{% endif %}
-	                                <th><small>{{job.status}}</small></th>
+	                                <!-- <th><small>{{job.status}}</small></th> -->
 	                                {% if job.cjid %}
 	                                <td><small><a onclick="show_job_result('job_cjid','{{job.cjid}}','{{job.target | join:','}}')">点击查看报告</a></small></td>
 	                               	{% else %}

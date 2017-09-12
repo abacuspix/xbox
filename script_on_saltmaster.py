@@ -51,47 +51,47 @@ def log(e):
 def parse_salt_event(eachevent):
 	try:
 		if pattern_job_ret.match(eachevent['tag']):
-			if eachevent['data']['fun'] == "saltutil.find_job":
-				if eachevent['data'].has_key('return') and eachevent['data']['return'].has_key('metadata'):
-					job_list.update_one({'metadata':eachevent['data']['return']['metadata']},\
-									{"$set": {"state_id":eachevent['data']['return']['jid']}})
-			else:
-				if eachevent['data'].has_key('id') and eachevent['data'].has_key('return'):
-					if eachevent['data']['fun'] == 'grains.items':
-						sql = '''INSERT INTO host (ip,hostname,os,is_virtual,minion_id,minion_status,update_time) VALUES \
-						(%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE ip=%s,hostname=%s,os=%s,is_virtual=%s,\
-						minion_id=%s,minion_status=%s,update_time=%s'''
-						items = eachevent['data']['return']
-						try:
-							# 执行sql语句
-							cursor.execute(sql,(items['ipv4'][1],items['fqdn'],' '.join([items['os'],items['osrelease']]),\
-							items['virtual'],items['id'],'O',eachevent['data']['_stamp'],items['ipv4'][1],items['fqdn'],' '.join([items['os'],items['osrelease']]),\
-							items['virtual'],items['id'],'O',eachevent['data']['_stamp']))
-							# 提交到数据库执行
-							mysql_db.commit()
-						except Exception as e:
-							# Rollback in case there is any error
-							mysql_db.rollback()
-							# write error log
-							log(e)
-						# grains.find_one_and_replace({'id':eachevent['data']['id']},eachevent['data'],upsert=True)
-						grains.insert_one(eachevent['data'])
-					elif re.match(r'.*salt\s+.+\s+state\.sls\s+(.+)',eachevent['data']['fun_args'][0]):
-						m = re.match(r'.*Failed:\s+(\d+).*',eachevent['data']['return'],re.DOTALL)
-						if m:
-							faild_count = int(m.groups()[0])
-							if faild_count:
-								job_list.update_one({'jid':eachevent['data']['jid']},\
-									{"$set": {"status":'Failed','progress':'Finish'}})
-							else:
-								job_list.update_one({'jid':eachevent['data']['jid']},\
-									{"$set": {"status":'Success','progress':'Finish'}})
+			if eachevent['data'].has_key('id') and eachevent['data'].has_key('return'):
+				if eachevent['data']['fun'] == 'grains.items':
+					sql = '''INSERT INTO host (ip,hostname,os,is_virtual,minion_id,minion_status,update_time) VALUES \
+					(%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE ip=%s,hostname=%s,os=%s,is_virtual=%s,\
+					minion_id=%s,minion_status=%s,update_time=%s'''
+					items = eachevent['data']['return']
+					try:
+						# 执行sql语句
+						cursor.execute(sql,(items['ipv4'][1],items['fqdn'],' '.join([items['os'],items['osrelease']]),\
+						items['virtual'],items['id'],'O',eachevent['data']['_stamp'],items['ipv4'][1],items['fqdn'],' '.join([items['os'],items['osrelease']]),\
+						items['virtual'],items['id'],'O',eachevent['data']['_stamp']))
+						# 提交到数据库执行
+						mysql_db.commit()
+					except Exception as e:
+						# Rollback in case there is any error
+						mysql_db.rollback()
+						# write error log
+						log(e)
+					# grains.find_one_and_replace({'id':eachevent['data']['id']},eachevent['data'],upsert=True)
+					grains.insert_one(eachevent['data'])
+				elif eachevent['data']['fun'] == 'state.sls':
+					ret = eachevent['data']['return']
+					tmp = {'process':{},'summary':{}}
+					succeeded = 0
+					failed = 0
+					total_duration = 0
+					for k,v in ret.items():
+						tmp1 = k.split('_|-')
+						fun = '.'.join([tmp1[0],tmp1[3]])
+						v['fun'] = fun
+						v['id'] = tmp1[1]
+						tmp['process'].update({str(v['__run_num__']):v})
+						if v['result'] == True:
+							succeeded += 1
 						else:
-							job_list.update_one({'jid':eachevent['data']['jid']},\
-									{"$set": {"status":'Failed','progress':'Finish'}})
-					else:
-						pass
+							failed += 1
+						total_duration += v['duration']
+					tmp['summary'].update({'succeeded':succeeded,'failed':failed,'total_duration':total_duration})
+					eachevent['data']['return'] = str(tmp)
+					job_ret.insert_one(eachevent['data'])
+				else:
 					job_ret.insert_one(eachevent['data'])
 	except Exception as e:
 		log(e)
-

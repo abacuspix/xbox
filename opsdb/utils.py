@@ -8,6 +8,7 @@ from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
 import time
 import os
+import json
 
 def exacute_cmd(user,client,target,arg_list):
 	result = {}
@@ -84,6 +85,45 @@ def run_script(user,client,target,arg_list,async):
 			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
 			'target':target,'fun':'cmd.script','arg':arg_list,\
 			'status':'','progress':'Finish','result':result,'cjid':str(int(round(time.time() * 1000)))}
+		MONGO_CLIENT.salt.joblist.insert_one(job)
+	except Exception as e:
+		error = str(e)
+	return result,error
+
+def state_deploy(user,client,target,arg_list,async):
+	result = {}
+	error = ''
+	try:
+		arg_list = 'states/' + arg_list
+		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
+		if async:
+			result = salt.run_async(fun='state.sls',target=target,arg_list=arg_list)
+			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+			'target':target,'fun':'state.sls','arg':arg_list,'progress':'','jid':result['jid']}
+		else:
+			ret = salt.run(fun='state.sls',target=target,arg_list=arg_list)
+			result = {}
+			for key,value in ret.items():
+				tmp = {'process':{},'summary':{}}
+				succeeded = 0
+				failed = 0
+				total_duration = 0
+				for k,v in value.items():
+					tmp1 = k.split('_|-')
+					fun = '.'.join([tmp1[0],tmp1[3]])
+					v['fun'] = fun
+					v['id'] = tmp1[1]
+ 					tmp['process'].update({str(v['__run_num__']):v})
+					if v['result'] == True:
+						succeeded += 1
+					else:
+						failed += 1
+					total_duration += v['duration']
+				tmp['summary'].update({'succeeded':succeeded,'failed':failed,'total_duration':total_duration})
+				result[key] = tmp
+			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+			'target':target,'fun':'state.sls','arg':arg_list,\
+			'status':'','progress':'Finish','result':str(result),'cjid':str(int(round(time.time() * 1000)))}
 		MONGO_CLIENT.salt.joblist.insert_one(job)
 	except Exception as e:
 		error = str(e)

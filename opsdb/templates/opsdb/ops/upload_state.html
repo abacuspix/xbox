@@ -57,26 +57,25 @@
           <div class="panel-body">
               <div class="tab-content">
                   <div class="tab-pane active">
-                      <form class="form-horizontal" enctype="multipart/form-data" role="form" action="{% url 'opsdb:upload_script' %}" method="post" role="form">
+                      <form class="form-horizontal" enctype="multipart/form-data" role="form" action="{% url 'opsdb:upload_state' %}" method="post" role="form">
                           {% csrf_token %}
 
                          <div class="form-group" >
-                          <label class="col-xs-2 col-md-2 col-sm-2">脚本别名</label>
+                          <label class="col-xs-2 col-md-2 col-sm-2">模块别名</label>
                           <div class="col-xs-10 col-md-10 col-sm-10">
-                             <input type="text" name="name" placeholder="该值须唯一,默认为脚本名" style="width: 306px;">
+                             <input type="text" name="name" placeholder="该值须唯一,默认为模块名" style="width: 306px;">
                           </div>
                         </div>
                         <br>   
-                        <div class="form-group" >
+                        <div class="form-group">
                           <div class="col-xs-8 col-md-6 col-sm-6" >
                              <input type="file" name="myfile" required>
                           </div>
                         </div>
-                        <p>Tip:
+                        <p>
                           <ol>
-                          	<li>该操作只是把脚本上传至文件服务器,并未分发到远端机器.</li>
-                          	<!-- <li>上传完成后可在下拉框选择已上传的文件用于分发到远端机器.</li> -->
-                            <!-- <li>如果是多个文件,请将所有文件放在一个文件夹内,打包成tar包后上传.</li> -->
+                            <li>如果是单个文件,请将文件打包成以模块名命名的tar包后上传.如:tar cvf test.tar test.sls</li>
+                            <li>如果是多个文件,请将所有文件放在一个以模块名命名的文件夹内,打包成tar包后上传.</li>
                           </ol> 
                         </p>
                         <div class="form-group">

@@ -10,15 +10,17 @@ from xbox.paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
-from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS,SALT_SCRIPTS
+from xbox.settings import SALT_MASTER_HOSTNAME,SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS,SALT_SCRIPTS,SALT_STATES
 from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
 from json2html import *
 from django.db.models import Q
 import time
-from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_minion,run_script
+from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_minion,run_script,state_deploy
 import os
+import collections
+import json
 # Create your views here.
 
 @login_required
@@ -521,7 +523,15 @@ def job_cjid(request,cjid):
 		for minion,ret in sjob['result'].items():
 			result[minion] = {'stderr':ret['stderr'],'stdout':ret['stdout']}
 		return render(request,'opsdb/ops/show_job_result.html',locals())
-	return render(request,'opsdb/ops/jobresult.html',locals())
+	elif sjob.has_key('fun') and sjob['fun'] == 'state.sls':
+		result = eval(sjob['result'])
+		for k,v in result.items():
+			process = collections.OrderedDict(sorted(v['process'].iteritems(),key=lambda x:x[0]))
+			summary = v['summary']
+			result[k] = {'process':process,'summary':summary}
+		return render(request,'opsdb/ops/show_state_result.html',locals())
+	else:
+		return render(request,'opsdb/ops/jobresult.html',locals())
 
 @login_required
 @role_required('hostadmin')
@@ -834,8 +844,81 @@ def job_jid(request,jid):
 	result = {}
 	if jobs:
 		for job in jobs:
-			result[job['id']] = {'stderr':job['return']['stderr'],'stdout':job['return']['stdout']}
+			if job['fun'] == 'state.sls':
+				ret = eval(job['return'])
+				process = collections.OrderedDict(sorted(ret['process'].iteritems(),key=lambda x:x[0]))
+				summary = ret['summary']
+				result[job['id']] = {'process':process,'summary':summary}
+			else:
+				result[job['id']] = {'stderr':job['return']['stderr'],'stdout':job['return']['stdout']}
 	else:
 		error = '抱歉,未查询到结果,请稍后再试.'
+	if result:
+		for k,v in result.items():
+			if v.has_key('process'):
+				return render(request,'opsdb/ops/show_state_result.html',locals())
+			else:
+				break
 	return render(request,'opsdb/ops/show_job_result.html',locals())
 
+@login_required
+@role_required('hostadmin')
+def states(request):
+	state_list = SaltState.objects.all()
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,states,page_number = my_paginator(state_list,page,page_number)
+	return render(request,'opsdb/ops/states.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def upload_state(request):
+	if request.method == 'POST':
+		myfile = request.FILES.get("myfile", None)
+		split = myfile.name.split('.')
+		name = request.POST.get('name') if request.POST.get('name') else split[0]
+		try:
+			state = SaltState.objects.create(name=name,state_name=split[0],created_by=request.user.username)
+			if state:
+				try:
+					state_path = os.path.join(SALT_STATES,myfile.name)
+					destination = open(state_path,'wb+') 
+					for chunk in myfile.chunks():
+						destination.write(chunk)  
+					destination.close()
+					if 'tar' in myfile.name:
+						os.system('tar xvf %s -C %s;rm -f %s'%(state_path,SALT_STATES,state_path))
+					messages.success(request, '模块上传成功')
+				except Exception as e:
+					state.delete()
+					messages.error(request, str(e))
+		except Exception as e:
+			messages.error(request, str(e))
+	return render(request,'opsdb/ops/upload_state.html')
+
+@login_required
+@role_required('hostadmin')
+def deploy_state(request,id):
+	try:
+		state = SaltState.objects.get(pk=id)
+		if request.method == 'POST':
+			user = request.user.username
+			if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+				client =  request.META['HTTP_X_FORWARDED_FOR']  
+			else:
+				client = request.META['REMOTE_ADDR']
+			salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
+			target = request.POST.get('hosts','').split(',')
+			async = request.POST.get('async')
+			arg_list = state.state_name
+			result,error = state_deploy(user,client,target,arg_list,async)
+			if error:
+				messages.error(request, error)
+			if not result.has_key('jid'):
+				for k,v in result.items():
+					process = collections.OrderedDict(sorted(v['process'].iteritems(),key=lambda x:x[0]))
+					summary = v['summary']
+					result[k] = {'process':process,'summary':summary}
+	except Exception as e:
+		messages.error(request, e)
+	return render(request,'opsdb/ops/deploy_state.html',locals())

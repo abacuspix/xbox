@@ -157,12 +157,14 @@ STATICFILES_DIRS = (
 
 FTP_IP = '192.168.3.169'
 FTP_PORT = '80'
+SALT_MASTER_HOSTNAME = 'prod'
 SALT_IP = '192.168.3.169'
 SALT_PORT = '8080'
 SALT_USER = 'salt_api'
 SALT_PASSWD = 'salt_api'
 SALT_FILE_ROOTS = '/srv/salt/files'
 SALT_SCRIPTS = '/srv/salt/scripts'
+SALT_STATES = '/srv/salt/states'
 MONGO_IP = '192.168.3.169'
 MONGO_PORT = '27017'
 from pymongo import MongoClient

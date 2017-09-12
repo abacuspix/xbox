@@ -60,4 +60,7 @@ urlpatterns = [
     url(r'^ops/scripts/delete/(\d+)/$',views.delete_script,name='delete_script'),
     url(r'^ops/scripts/exacute/(\d+)/$',views.exacute_script,name='exacute_script'),
     url(r'^ops/scripts/search/$',views.search_script,name='search_script'),
+    url(r'^ops/states/$',views.states,name='states'),
+    url(r'^ops/states/upload/$',views.upload_state,name='upload_state'),
+    url(r'^ops/states/deploy/(\d+)/$',views.deploy_state,name='deploy_state'),
 ]

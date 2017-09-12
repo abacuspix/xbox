@@ -172,5 +172,18 @@ class Script(models.Model):
 
 	def __unicode__(self):
 		return self.name		
-		
+
+class SaltState(models.Model):
+	name               = models.CharField(unique=True,max_length=100)
+	state_name         = models.CharField(unique=True,max_length=100)
+	created_by         = models.CharField(max_length=80,blank=True,null=True)
+	comment            = models.CharField(max_length=200,blank=True,null=True)
+	create_time        = models.DateTimeField(auto_now_add=True)
+	update_time        = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'state'
+
+	def __unicode__(self):
+		return self.name				
 
