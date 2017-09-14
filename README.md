@@ -140,3 +140,11 @@ python manage.py runserver 0.0.0.0:8000
 http://ip:8000  
 初始账户及密码：admin/admin@123
 ```
+
+### Contributors
+
+@feng.tang
+
+### Contact
+
+Send me an email to uevol@outlook.com.
