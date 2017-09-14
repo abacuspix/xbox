@@ -51,6 +51,7 @@ urlpatterns = [
     url(r'^ops/save_cmd/$',views.save_cmd,name='save_cmd'),
     url(r'^ops/files/get/$',views.get_file,name='get_file'),
     url(r'^ops/files/put/$',views.put_file,name='put_file'),
+    url(r'^ops/files/delete/(\d+)/$',views.delete_file,name='delete_file'),
     url(r'^ops/files/push/$',views.push_file,name='push_file'),
     url(r'^ops/scripts/$',views.scripts,name='scripts'),
     url(r'^ops/scripts/upload/$',views.upload_script,name='upload_script'),

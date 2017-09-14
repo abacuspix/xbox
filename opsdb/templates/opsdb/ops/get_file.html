@@ -76,30 +76,37 @@
               </ul>
           </header>
           <section class="panel" style="margin-bottom: -10px;">
-            <div class="panel-body col-lg-12 col-sm-12" style="height: 100px;">
-              <div class="col-lg-10 col-sm-10">
+            <div class="panel-body col-lg-12 col-sm-12">
+              <div class="col-lg-1 col-sm-1">
+                    <form enctype="multipart/form-data" action="{% url 'opsdb:put_file' %}" method="POST" id="upload_file">
+                      <input id="lefile" type="file" style="display:none" name='file'>
+                      <button class="btn btn-white" style="height: 30px;" type="button" onclick="$('input[id=lefile]').click();">添加本地</button>
+                    </form>
+              </div>
+              <div class="col-lg-9 col-sm-9">
                 <form class="form-horizontal" role="form" action="{% url 'opsdb:get_file' %}" method="POST" id="get_file">
                 {% csrf_token %}
                     <div class="form-group">
                         <div class="col-lg-6 col-sm-6">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="icon-cloud-upload" onclick="put_file()"></i></span>
                                 <select class="form-control input-sm" name="file" required>
-                                        <option value="test.sh" selected>test.sh</option>
+                                        <option value="">--请选择--</option>
                                     {% for file in files %}
-                                        <option value="{{file}}">{{file}}</option>
+                                      {% if file.name == myfile.name %}
+                                        <option value="{{file.name}}" selected>{{file.name}}</option>
+                                      {% else%}
+                                        <option value="{{file.name}}">{{file.name}}</option>
+                                      {% endif %}
                                     {% endfor %}
                                 </select>
-
-                            </div>
                         </div>
+                       
                         <div class="col-lg-6 col-sm-6">
                             <input type="text" class="form-control input-sm" name="remote_path" id="remote_path" placeholder="远端路径,如: /tmp/test.sh" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-1 col-sm-1 control-label">主机</label>
-                        <div class="col-lg-11 col-sm-11">
+                        <label class="col-lg-1 col-sm-1 control-label" style="right: 70px;">主机</label>
+                        <div class="col-lg-11 col-sm-11" style="right: 65px;">
                             <input type="text" class="form-control input-sm" name="hosts" id="hosts" value="{{hosts}}">
                         </div>
                     </div>
@@ -114,21 +121,52 @@
                   </div>
                 </div>            
             </div>
+          </section>
+          
+          {% if result %}
+              <section class="panel">
+                  <div class="panel-body">
+                    <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;height:100%;">
+                        {% for minion,return in result.items %}
+<b>{{minion}}:</b>{{return}}
+                        {% endfor %}
+                    </pre>
+                  </div>
+              </section>
+          {% endif %}
         </section>
+
         <section class="panel">
-            <div class="panel-body">
-            {% if result %}
-              {% for minion,return in result.items %}
-              <div class="col-lg-12 col-sm-12" style="min-height: 380px;">
-                <b>{{minion}}:</b>
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;;height:100%;">{{return}}</pre>
+          <section class="panel">
+              <div class="panel-body">
+                <div class="col-lg-12 col-sm-12" style="min-height: 380px;">
+                  <table class="table table-inbox table-hover" border="5" id='mytable'>
+                      <thead>
+                              <tr>
+                                <th><small>文件</small></th>
+                                <th><small>上传用户</small></th>
+                                <th><small>上传时间</small></th>
+                                <th><small>操作</small></th>
+                              </tr>
+                        </thead>
+                          <tbody>
+                            {% for file in files %}
+                              <tr>
+                                <td><small>{{file.name}}</small></td>
+                                <td><small>{{file.created_by}}</small></td>
+                                <td><small>{{file.create_time | date:'Y-m-d H:m:s'}}</small></td>
+                                <td style="width: 26px;">
+                                  <small>
+                                    <button class="btn btn-danger btn-xs"><a href="{% url 'opsdb:delete_file' file.id %}"><i class="icon-trash"></i></a></button>
+                                  </small>
+                                </td>
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                    </table>
+                </div>
               </div>
-              {% endfor %}
-            {% else %}
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">{{error}}</pre>
-            {% endif %}
-            </div>
-        </section>
+          </section>
         </section>
         <!-- page end-->
     </section>
@@ -223,6 +261,12 @@
         }
     }
 
+
+    $('#lefile').change(function(){
+          document.getElementById('upload_file').submit();
+          // var fileName = $(this).val().split('/').pop().split('\\').pop();
+          // $('#filename').val(fileName);
+    });
     </script>
   </body>
 </html>

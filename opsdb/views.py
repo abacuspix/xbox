@@ -592,7 +592,8 @@ def delete_cmds(request):
 @login_required
 @role_required('hostadmin')
 def get_file(request):
-	files = os.listdir(SALT_FILE_ROOTS)
+	# files = os.listdir(SALT_FILE_ROOTS)
+	files = File.objects.all()
 	if request.method == 'POST':
 		file = request.POST.get('file','')
 		remote_path = request.POST.get('remote_path','')
@@ -604,27 +605,49 @@ def get_file(request):
 		else:
 			client = request.META['REMOTE_ADDR']
 		result,error = push_file_to_minion(user,client,target,arg_list)
+		if error:
+			messages.error(request, error)
 	return render(request,'opsdb/ops/get_file.html',locals())
 
 @login_required
 @role_required('hostadmin')
+@csrf_exempt
 def put_file(request):
 	if request.method == 'POST':
-		file = request.FILES.get("myfile", None)
-		if not file:  
+		file = request.FILES.get("file", None)
+		if not file:
 			messages.error(request, 'No files for upload!')
 		else:
 			user = request.user.username
 			if request.META.has_key('HTTP_X_FORWARDED_FOR'):
-				client =  request.META['HTTP_X_FORWARDED_FOR']  
+				client =  request.META['HTTP_X_FORWARDED_FOR']
 			else:
 				client = request.META['REMOTE_ADDR']
-			result,error = upload_file(user,client,SALT_FILE_ROOTS,file)
-			if result:
-				messages.success(request, '文件上传成功')
-			else:
-				messages.error(request, error)
-	return render(request,'opsdb/ops/put_file.html',locals())
+			try:
+				myfile = File.objects.create(name=file.name,created_by=user)
+				if myfile:
+					error = upload_file(user,client,SALT_FILE_ROOTS,file)
+					if error:
+						myfile.delete()
+						messages.error(request, error)
+			except Exception as e:
+				messages.error(request, e)
+	files = File.objects.all()
+	return render(request,'opsdb/ops/get_file.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def delete_file(request,id):
+	try:
+		file = File.objects.get(pk=id)
+		if file:
+			file_path = os.path.join(SALT_FILE_ROOTS,file.name)
+			os.remove(file_path)
+			file.delete()
+			messages.success(request, '文件已经删除')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:get_file')
 
 @login_required
 @role_required('hostadmin')
@@ -667,7 +690,7 @@ def upload_script(request):
 						client =  request.META['HTTP_X_FORWARDED_FOR']  
 					else:
 						client = request.META['REMOTE_ADDR']
-					result,error = upload_file(user,client,SALT_SCRIPTS,file)
+					error = upload_file(user,client,SALT_SCRIPTS,file)
 					if not error:
 						messages.success(request, '脚本上传成功')
 					else:

@@ -6,6 +6,7 @@
 from xbox.settings import SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS
 from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
+from .models import File
 import time
 import os
 import json
@@ -40,21 +41,25 @@ def push_file_to_minion(user,client,target,arg_list):
 	return result,error
 
 def upload_file(user,client,destination,file):
-	result = False
+	# result = False
 	error = ''
 	try:
 		f = open(os.path.join(destination,file.name),'wb+') 
 		for chunk in file.chunks():
 			f.write(chunk)  
 		f.close()
-		result = True
-		job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
-		'target':'salt master','fun':'upload file to salt master','arg':file.name,\
-		'status':'','progress':'Finish','result':'Success','cjid':str(int(round(time.time() * 1000)))}
-		MONGO_CLIENT.salt.joblist.insert_one(job)
+		try:
+			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
+			'target':'salt master','fun':'upload file to salt master','arg':file.name,\
+			'status':'','progress':'Finish','result':'Success','cjid':str(int(round(time.time() * 1000)))}
+			MONGO_CLIENT.salt.joblist.insert_one(job)
+			# result = True
+		except Exception as e:
+			os.remove(os.path.join(destination,file.name))
+			error = str(e)
 	except Exception as e:
 		error = str(e)
-	return result,error
+	return error
 
 def get_file_from_minion(user,client,target,arg_list):
 	result = {}
