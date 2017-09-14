@@ -43,15 +43,14 @@
 
         <!-- page start-->
         <section class="panel">
-            <div class="panel-body">
-              <div class="col-lg-10 col-sm-10" style="height: 30px;">
+            <div class="panel-body col-lg-12 col-sm-12" style="height: 100px;">
+              <div class="col-lg-10 col-sm-10">
                 <form class="form-horizontal" role="form" action="{% url 'opsdb:deploy_state' state.id %}" method="POST" id="deploy_state">
                 {% csrf_token %}
                     <div class="form-group">
                         <label class="col-lg-1 col-sm-1 control-label">模块</label>
                         <div class="col-lg-10 col-sm-10">
                             <input type="text" class="form-control input-sm " name="state" value="{{state.name}}" required="required" id="script" readonly="readonly">
-                            <input type="hidden" class="form-control" name="hosts" id="hosts" value="{{hosts}}">
                         </div>
                         <div class="checkbox col-lg-1 col-sm-1">
 	                          <label>
@@ -63,23 +62,31 @@
                             </label>
                         </div>
                     </div>
+                     <div class="form-group">
+                          <label class="col-lg-1 col-sm-1 control-label">主机</label>
+                          <div class="col-lg-11 col-sm-11">
+                              <input type="text" class="form-control input-sm" name="hosts" id="hosts" value="{{hosts}}">
+                          </div>
+                    </div>
                 </form>
               </div>
-              
-              <div class="col-lg-1 col-sm-1">
-                  <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 主机</button>
-              </div> 
-              <div class="col-lg-1 col-sm-1" style="right: 10px;">
-                  <button class="btn btn-info btn-sm" onclick="deploy_state()"><i class="icon-play"></i> 开始部署</button>
-              </div>           
+
+               <div class="col-lg-2 col-sm-2">
+                <div class="form-group">
+                      <button class="btn btn-info btn-sm" onclick="deploy_state()"><i class="icon-play"></i> 开始部署</button>
+                </div>
+                <div class="form-group">
+                      <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 选择主机</button>
+                </div>
+              </div>   
             </div>
         </section>
         <section class="panel">
-            <div class="panel-body" style="min-height: 450px;">
+            <div class="panel-body" style="min-height: 380px;">
               <div class="col-lg-12 col-sm-12" style="height: 100%;">
                 
 	               	{% if result.jid %}
-                  <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">
+                  <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">
 后台异步部署,点击Job ID可查看结果,或者到操作记录查看结果。
 
 Job ID : <a onclick="show_result('{{result.jid}}')">{{result.jid}}</a>
@@ -87,7 +94,7 @@ Job ID : <a onclick="show_result('{{result.jid}}')">{{result.jid}}</a>
                   {% elif result %}
 	              		{% for minion,return in result.items %}
 <b>{{minion}}:</b>
-                  <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">
+                  <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">
                       {% for key,value in return.process.items %}
 Step {{key}} | {{value.id}}:
 {{'Name'|rjust:'15'}}: {{value.name}}
@@ -108,13 +115,13 @@ Summary for {{minion}}
                   </pre>
 		              	{% endfor %}
                   {% else%}
-                  <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">
+                  <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">
                   </pre>
                   {% endif %}
 			  	     
               </div>
 		              {% if error %}
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">{{error}}</pre>
+                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">{{error}}</pre>
                   {% endif %}
             </div>
         </section>
@@ -153,6 +160,7 @@ Summary for {{minion}}
       else
         {
           document.getElementById("deploy_state").submit();
+          layer.load(1);
         }
     }
 

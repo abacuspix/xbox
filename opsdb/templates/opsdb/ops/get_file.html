@@ -76,13 +76,13 @@
               </ul>
           </header>
           <section class="panel" style="margin-bottom: -10px;">
-            <div class="panel-body">
-              <div class="col-lg-10 col-sm-10" style="height: 30px;">
+            <div class="panel-body col-lg-12 col-sm-12" style="height: 100px;">
+              <div class="col-lg-10 col-sm-10">
                 <form class="form-horizontal" role="form" action="{% url 'opsdb:get_file' %}" method="POST" id="get_file">
                 {% csrf_token %}
                     <div class="form-group">
                         <div class="col-lg-6 col-sm-6">
-                            <div class="input-group m-bot15">
+                            <div class="input-group">
                                 <span class="input-group-addon"><i class="icon-cloud-upload" onclick="put_file()"></i></span>
                                 <select class="form-control input-sm" name="file" required>
                                         <option value="test.sh" selected>test.sh</option>
@@ -95,30 +95,37 @@
                         </div>
                         <div class="col-lg-6 col-sm-6">
                             <input type="text" class="form-control input-sm" name="remote_path" id="remote_path" placeholder="远端路径,如: /tmp/test.sh" required>
-                            <input type="hidden" class="form-control" name="hosts" id="hosts" value="{{hosts}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-1 col-sm-1 control-label">主机</label>
+                        <div class="col-lg-11 col-sm-11">
+                            <input type="text" class="form-control input-sm" name="hosts" id="hosts" value="{{hosts}}">
                         </div>
                     </div>
                 </form>
               </div>
-              <div class="col-lg-1 col-sm-1" style="right: 10px;">
-                  <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 主机</button>
-              </div>   
-              <div class="col-lg-1 col-sm-1" style="right: 20px;">
-                  <button class="btn btn-info btn-sm" onclick="get_file()"><i class="icon-cloud-upload"></i> 开始上传</button>
-              </div>              
+              <div class="col-lg-2 col-sm-2">
+                  <div class="form-group">
+                        <button class="btn btn-info btn-sm" onclick="get_file()"><i class="icon-cloud-upload"></i> 开始上传</button>
+                  </div>
+                   <div class="form-group">
+                        <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 选择主机</button>
+                  </div>
+                </div>            
             </div>
         </section>
         <section class="panel">
             <div class="panel-body">
             {% if result %}
               {% for minion,return in result.items %}
-              <div class="col-lg-12 col-sm-12" style="min-height: 400px;">
+              <div class="col-lg-12 col-sm-12" style="min-height: 380px;">
                 <b>{{minion}}:</b>
                 <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;;height:100%;">{{return}}</pre>
               </div>
               {% endfor %}
             {% else %}
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">{{error}}</pre>
+                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">{{error}}</pre>
             {% endif %}
             </div>
         </section>
@@ -211,7 +218,7 @@
         {
           document.getElementById("get_file").submit();
           layer.msg('正在分发文件,请耐心等待...',function(){
-            layer.load();
+            layer.load(1);
           });
         }
     }

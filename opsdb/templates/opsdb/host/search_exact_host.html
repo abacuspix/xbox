@@ -1,0 +1,180 @@
+search_host.html{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Mosaddek">
+    <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+    <link rel="shortcut icon" href="{%static 'img/favicon.ico'%}">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css'%}" rel="stylesheet">
+    <link href="{%static 'css/bootstrap-reset.css'%}" rel="stylesheet">
+    <!--external css-->
+    <link href="{%static 'assets/font-awesome/css/font-awesome.css'%}" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-fileupload/bootstrap-fileupload.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-datepicker/css/datepicker.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-timepicker/compiled/timepicker.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-colorpicker/css/colorpicker.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-daterangepicker/daterangepicker-bs3.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-datetimepicker/css/datetimepicker.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/bootstrap-wysihtml5/bootstrap-wysihtml5.css'%}" />
+    <link rel="stylesheet" href="{%static 'assets/jquery-multi-select/css/multi-select.css'%}" />
+    <!-- Custom styles for this template -->
+    <link href="{%static 'css/style.css'%}" rel="stylesheet">
+    <link href="{%static 'css/style-responsive.css'%}" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
+    <!--[if lt IE 9]>
+      <script src="{%static 'js/html5shiv.js'%}"></script>
+      <script src="{%static 'js/respond.min.js'%}"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <section class="wrapper site-min-height">
+      <!-- page start-->
+      <div class="row">
+        <div class="col-lg-12">
+            <!--breadcrumbs start -->
+            <ul class="breadcrumb">
+                <li><a href="#"></i>运维数据库</a></li>
+                <li><a href="{%url 'opsdb:hosts'%}"></i>主机管理</a></li>
+                <li class="active">主机搜索</li>
+            </ul>
+            <!--breadcrumbs end -->
+        </div>
+      </div>
+
+            <div class="row">
+        <div class="col-lg-12" id="message">
+             {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="alert alert-block alert-danger fade in">
+                            <button data-dismiss="alert" class="close close-sm" type="button">
+                                <i class="icon-remove"></i>
+                            </button>
+                            <strong>Error !</strong> {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success fade in">
+                            <button data-dismiss="alert" class="close close-sm" type="button">
+                                <i class="icon-remove"></i>
+                            </button>
+                            <strong>Success !</strong> {{ message }}
+                        </div>
+                    {% endif %}                  
+                {% endfor %}
+              {% endif %}
+        </div>
+      </div>
+	      <div class="row">
+              <div class="col-md-12">
+                  <section class="panel">
+                      <div class="panel-body">
+   <form class="form-horizontal" role="form" action="{% url 'opsdb:search_exact_host' %}" method="post" role="form" id='install_minion'>
+          {% csrf_token %}     
+        <div class="form-group">
+          <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">系统发行版本</span></label>
+          <div class="col-xs-8 col-md-6 col-sm-6" >
+                <select class="form-control m-bot15" name="os">
+                <option value="" selected>--请选择--</option>
+                      {% for os in  oses %}
+                      	<option value="{{os.os}}">{{ os.os }}</option>
+                      {% endfor %}
+                </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">虚拟/物理机</span></label>
+          <div class="col-xs-8 col-md-6 col-sm-6" >
+                <select class="form-control m-bot15" name="virtual">
+                		<option value="" selected>--请选择--</option>
+                      {% for is_virtual in  virtual %}
+                      	<option value="{{is_virtual.is_virtual}}">{{ is_virtual.is_virtual }}</option>
+                      {% endfor %}
+                </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+                <label class="control-label col-md-3">主机组</label>
+                <div class="col-xs-8 col-md-6 col-sm-6">
+                    <select class="form-control m-bot15" name="hostgroup">
+                        <option value="" selected>--请选择--</option>
+	                      {% for hostgroup in  hostgroups %}
+	                      	<option value="{{hostgroup.name}}">{{ hostgroup.name }}</option>
+	                      {% endfor %}
+	                </select>
+	            </div>
+          </div>
+
+		  <div class="form-group">
+	          <label class="col-md-3 col-sm-3 col-xs-3 control-label"><span class="required">环境 </span></label>
+	          <div class="col-xs-8 col-md-6 col-sm-6" >
+	                  <select class="form-control m-bot15" name="env">
+	                          <option value="" selected>--请选择--</option>
+	                      {% for env in  envs %}
+	                          <option value="{{env.id}}">{{ env.name }}</option>
+	                      {% endfor %}
+	                  </select>
+	          </div>
+	      </div>
+
+
+	        <div class="form-group">
+	          <div class="col-xs-8 col-md-6 col-sm-6">
+	            <button type="submit" class="btn">提交</button>
+	          </div>
+	        </div>
+      </form>
+                  </div>
+                  </section>
+              </div>
+          </div>
+      <!-- page end-->
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script class="include" type="text/javascript" src="{%static 'js/jquery.dcjqaccordion.2.7.js'%}"></script>
+    <script src="{%static 'js/jquery.scrollTo.min.js'%}"></script>
+    <script src="{%static 'js/jquery.nicescroll.js'%}" type="text/javascript"></script>
+    <script src="{%static 'js/respond.min.js'%}" ></script>
+
+    <!--this page plugins-->
+    <script type="text/javascript" src="{%static 'assets/fuelux/js/spinner.min.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-fileupload/bootstrap-fileupload.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-wysihtml5/wysihtml5-0.3.0.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-wysihtml5/bootstrap-wysihtml5.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-datepicker/js/bootstrap-datepicker.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-daterangepicker/moment.min.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-daterangepicker/daterangepicker.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-colorpicker/js/bootstrap-colorpicker.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/bootstrap-timepicker/js/bootstrap-timepicker.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/jquery-multi-select/js/jquery.multi-select.js'%}"></script>
+    <script type="text/javascript" src="{%static 'assets/jquery-multi-select/js/jquery.quicksearch.js'%}"></script>
+    
+    <!--common script for all pages-->
+    <script src="{%static 'js/common-scripts.js'%}"></script>
+    <script src="{%static 'layer/layer.js'%}"></script>
+    
+    <!--this page  script only-->
+    <script src="{%static 'js/advanced-form-components.js'%}"></script> 
+    <script type="text/javascript">
+      function install_minion(){
+          document.getElementById("install_minion").submit();
+          layer.msg('正在安装saltstack客户端,请耐心等待...',function(){
+            layer.load(1);
+          });
+        }
+    </script>
+  </body>
+</html>

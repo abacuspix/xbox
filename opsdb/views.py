@@ -281,64 +281,38 @@ def search_host(request):
 	paginator,hosts,page_number = my_paginator(host_list,page,page_number)
 	return render(request,'opsdb/host/hosts.html',locals())
 
-def search_exact(request):
+def search_exact_host(request):
 	if request.method == "GET":
 		envs = Environment.objects.all()
 		hostgroups = HostGroup.objects.all()
 		oses = Host.objects.values('os').distinct()
-		return render(request,'opsdb/host/search_exact.html',locals())
+		virtual = Host.objects.values('is_virtual').distinct()
+		return render(request,'opsdb/host/search_exact_host.html',locals())
 	else:
 		env = request.POST.get('env','')
-		business = request.POST.get('business','')
-		app = request.POST.get('app','')
 		hostgroup = request.POST.get('hostgroup','')
 		os = request.POST.get('os','')
-		cpu_num = request.POST.get('cpu_num','')
-		operater = request.POST.get('operater','')
-		mem_total = request.POST.get('mem_total','')
+		virtual = request.POST.get('virtual','')
 		q = Q()
 		if env:
-			q = q & Q(applications__business__environment__name=env)
-		if business:
-			q = q & Q(applications__business__name=business)		
-		if app:
-			q = q & Q(applications__name=app)
+			q = q & Q(environment__name=env)
 		if hostgroup:
 			q = q & Q(hostgroups__name=hostgroup)
 		if os:
 			q = q & Q(os=os)
-		if cpu_num:
-			q = q & Q(num_cpus=cpu_num)
-		if mem_total:
-			if operater == 'gt':
-				q = q & Q(mem_total__gt=("%.2f")%(float(mem_total)))
-			elif operater == 'lt':
-				q = q & Q(mem_total__lt=("%.2f")%(float(mem_total)))
-			else:
-				q = q & Q(mem_total=("%.2f")%(float(mem_total)))
+		if virtual:
+			q = q & Q(is_virtual=virtual)
 		if request.user.is_superuser:
-			host_list = Host.objects.select_related().filter(q,is_delete=False).distinct()
+			host_list = Host.objects.select_related().filter(q).distinct()
 		else:
 			if request.user.groups:
-				system_list = []
+				host_list = []
 				for group in request.user.groups.all():
 					for hostgroup in group.rule.hostgroups.all():
-						host_list.extend(hostgroup.host_set.filter(q,is_delete=False)).distinct()
+						host_list.extend(hostgroup.host_set.filter(q).distinct())
 		page_number =  request.GET.get('page_number')
-		if page_number:
-			page_number = int(page_number)
-		else:
-			page_number =  10
-		paginator = my_paginator(host_list, page_number)
 		page = request.GET.get('page')
-		try:
-			hosts = paginator.page(page)
-		except PageNotAnInteger:
-			# If page is not an integer, deliver first page.
-			hosts = paginator.page(1)
-		except EmptyPage:
-			# If page is out of range (e.g. 9999), deliver last page of results.
-			hosts = paginator.page(paginator.num_pages)
+		paginator,hosts,page_number = my_paginator(host_list,page,page_number)
 		return render(request,'opsdb/host/hosts.html',locals())
 
 @login_required
@@ -713,9 +687,10 @@ def edit_script(request,id):
 			script_name = request.POST.get('script_name')
 			name = request.POST.get('name')
 			file = request.POST.get('script')
-			f = open(file_path,'w')
+			f = open(file_path.encode('utf8'),'w')
 			f.write(file)
 			f.close()
+			os.system('dos2unix %s'%(file_path))
 			script.comment = request.user.username
 			script.script_name = script_name
 			script.name = name
@@ -743,9 +718,10 @@ def add_script(request):
 			script = Script.objects.create(name=name,script_name=script_name,created_by=request.user.username,comment=request.user.username)
 			if script:
 				try:
-					f = open(file_path,'w')
+					f = open(file_path.encode('utf8'),'wb+')
 					f.write(file)
 					f.close()
+					os.system('dos2unix %s'%(file_path))
 					messages.success(request, '保存成功')
 					f = open(file_path,'r')
 					file = f.read()
@@ -771,9 +747,10 @@ def copy_script(request,id):
 			if new_script:
 				try:
 					file_path = os.path.join(SALT_SCRIPTS,script_name)
-					f = open(file_path,'w')
+					f = open(file_path.encode('utf8'),'wb+')
 					f.write(file)
 					f.close()
+					os.system('dos2unix %s'%(file_path))
 					messages.success(request, '复制成功')
 				except Exception as e:
 					new_script.delete()
@@ -922,3 +899,20 @@ def deploy_state(request,id):
 	except Exception as e:
 		messages.error(request, e)
 	return render(request,'opsdb/ops/deploy_state.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def delete_state(request,id):
+	try:
+		state = SaltState.objects.get(pk=id)
+		if state:
+			file_path = os.path.join(SALT_STATES,state.state_name)
+			if os.path.isdir(file_path):
+				os.system('rm -rf %s'%(file_path))
+			else:
+				os.remove('.'.join([file_path,'sls']))
+			state.delete()
+			messages.success(request, '模块已经删除')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:states')

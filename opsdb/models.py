@@ -185,5 +185,16 @@ class SaltState(models.Model):
 		db_table = 'state'
 
 	def __unicode__(self):
-		return self.name				
+		return self.name
+
+class File(models.Model):
+	name               = models.CharField(unique=True,max_length=100)
+	created_by         = models.CharField(max_length=80,blank=True,null=True)
+	create_time        = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		db_table = 'file'
+
+	def __unicode__(self):
+		return self.name						
 

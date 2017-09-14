@@ -42,42 +42,46 @@
 
         <!-- page start-->
         <section class="panel">
-            <div class="panel-body">
-              <div class="col-lg-10 col-sm-10" style="height: 30px;">
-                <form class="form-horizontal" role="form" action="{% url 'opsdb:cmd' %}" method="POST" id="exactue_cmd">
-                {% csrf_token %}
-                    <div class="form-group">
-                        <label class="col-lg-1 col-sm-1 control-label">命令</label>
-                        <div class="col-lg-11 col-sm-11">
-                            <input type="text" class="form-control input-sm " name="cmd" value="{{arg_list}}" required="required" placeholder="echo hello" id="cmd">
-                            <input type="hidden" class="form-control" name="hosts" id="hosts" value="{{hosts}}">
-                        </div>
-                    </div>
-                </form>
-              </div>
-              
-              <div class="col-lg-1 col-sm-1">
-                  <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 主机</button>
-              </div> 
-              <div class="col-lg-1 col-sm-1" style="right: 10px;">
-                  <button class="btn btn-info btn-sm" onclick="exactue_cmd()"><i class="icon-play"></i> 执行</button>
-              </div>
-              <!-- <div class="col-lg-1 col-sm-1" style="right: 20px;">
-                  <button class="btn btn-sm" onclick="save_cmd()"><i class="icon-save"></i> 保存命令</button>
-              </div>   -->              
+            <div class="panel-body col-lg-12 col-sm-12" style="height: 100px;">
+                <div class="col-lg-10 col-sm-10">
+                  <form class="form-horizontal" role="form" action="{% url 'opsdb:cmd' %}" method="POST" id="exactue_cmd">
+                  {% csrf_token %}
+                      <div class="form-group">
+                          <label class="col-lg-1 col-sm-1 control-label">命令</label>
+                          <div class="col-lg-11 col-sm-11">
+                              <input type="text" class="form-control input-sm" name="cmd" value="{{arg_list}}" placeholder="echo hello" id="cmd">
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label class="col-lg-1 col-sm-1 control-label">主机</label>
+                          <div class="col-lg-11 col-sm-11">
+                              <input type="text" class="form-control input-sm" name="hosts" id="hosts" value="{{hosts}}">
+                          </div>
+                      </div>
+                  </form>
+                </div>
+                
+                <div class="col-lg-2 col-sm-2">
+                  <div class="form-group">
+                        <button class="btn btn-info btn-sm" onclick="exactue_cmd()" id="submit"><i class="icon-play"></i> 开始执行</button>
+                  </div>
+                   <div class="form-group">
+                        <button class="btn btn-sm" onclick="selete_host()"><i class="icon-filter"></i> 选择主机</button>
+                  </div>
+                </div> 
             </div>
         </section>
         <section class="panel">
-            <div class="panel-body" style="min-height: 450px;">
+            <div class="panel-body" style="min-height: 380px;">
             {% if result %}
               {% for minion,return in result.items %}
-              <div class="col-lg-12 col-sm-12" style="height: 100%;">
+              <div class="col-lg-12 col-sm-12" >
                 <b>{{minion}}:</b>
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;;height:100%;">{{return}}</pre>
+                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;height:100%;">{{return}}</pre>
               </div>
               {% endfor %}
             {% else %}
-                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:420px;">{{error}}</pre>
+                <pre class="modal-body" style="margin-bottom: 10px;border-radius: 8px;background: black;color:white;min-height:380px;">{{error}}</pre>
             {% endif %}
             </div>
         </section>
@@ -115,7 +119,9 @@
         }
       else
         {
+          // document.getElementById("submit").attr("disabled","true");
           document.getElementById("exactue_cmd").submit();
+          layer.load(1);
         }
     }
 
@@ -137,7 +143,6 @@
                   var body = layer.getChildFrame('body',index);//建立父子联系
                   var iframeWin = window[layero.find('iframe')[0]['name']];
                   // console.log(arr); //得到iframe页的body内容
-                  console.log(body.find('input'));
                   var inputList = body.find('input');
                   $(inputList[1]).val(cmd);
               }

@@ -129,7 +129,7 @@
                                     <td style="width: 80px;">
                                       <small>
                                         <button class="btn btn-info btn-xs" ><a href="{% url 'opsdb:deploy_state' state.id %}" data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="部署模块"><i class="icon-play"></i></a></button>
-                                        <button class="btn btn-danger btn-xs"><a href="#" data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="删除"><i class="icon-trash"></i></a></button>
+                                        <button class="btn btn-danger btn-xs"><a href="{% url 'opsdb:delete_state' state.id %}" data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="删除"><i class="icon-trash"></i></a></button>
                                       </small>
                                     </td>
                                   </tr>
