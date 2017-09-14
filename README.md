@@ -1,42 +1,35 @@
-# 自动化运维平台 
-## 1、从github下载开发代码
+# xbox
+[xbox](http://180.175.180.251:9000) (admin/admin@123) 是一个自动化运维平台，目前模块包括自动化装机(cobbler)、自动化配置(saltstack)、权限管理、操作审计。
 
-```
-git clone https://github.com/uevol/xbox.git
-```
+### 技术栈
+开发语言: python(2.7)
 
-## 2、配置python开发库
+后端框架：Django(1.11)
 
-### 方法1、直接从网络安装
-#### 配置pip豆瓣源(可选,可以有效提升安装速度)
-```
-mkdir  ~/.pip/
-cd ~/.pip/
-vi pip.conf
+前端框架：Bootstrap
 
-[global]
-index-url = http://pypi.douban.com/simple
-trusted-host = pypi.douban.com
-```
+数据库：MySQL(5.7),MongoDB(3.4)
 
-#### 实际测试在pip install之前以下软件需提前安装：
-```
-yum -y install MySQL-python
-yum -y install python-devel libxml2-devel libxslt-devel gcc
-yum -y install openssl openssl-devel
-```
+自动化装机：Cobbler(2.8)
 
-#### 安装python开发库
+自动化配置： Saltstack(2016.5)
+
+### Requirements
+
+cobbler, saltstack, mongodb, mysql, django-rq（详细文档查看document内相关文档）
+
+### QuickStart
+
+####### 安装python开发库
 ```
-cd vbox/ops/
 pip install -r requirements.txt
 ```
 
 
-## 3、配置settings.py文件(根据实际情况修改配置)
+####### 配置settings.py文件(根据实际情况修改配置)
 主要修改以下条目
 ```
-# Configure your queues
+# Configure your queues for djanog-rq
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
@@ -77,11 +70,10 @@ from pymongo import MongoClient
 MONGO_CLIENT = MongoClient(MONGO_IP,int(MONGO_PORT))
 ```
 
-## 4、设置数据库
+####### 设置数据库
 
-### 如果只是测试，可直接使用内置开发数据库(sqlite3)
+1、如果只是测试，可直接使用内置开发数据库(sqlite3)
 
-#### 修改opsp配置文件settings.py的数据库配置：
 ```
 DATABASES = {  
     'default': { 
@@ -91,73 +83,26 @@ DATABASES = {
 } 
 ```
 
-### for postgresql
 
-#### 切换用户
-```
-su postgres
-psql -U postgres 
-```
+2、使用MySQL
 
-#### 修改密码(可选)：
-```
-\password postgres  
-```
-
-#### 创建数据库用户dbuser，并设置密码:
-```
-CREATE USER ops WITH PASSWORD 'ops@123';  
-```
-
-#### 创建用户数据库，这里为opsdb，并指定所有者为ops:
-```
-CREATE DATABASE ops OWNER ops;  
-```
-
-#### 将opsdb数据库的所有权限都赋予ops，否则ops只能登录控制台，没有任何数据库操作权限:
-```
-GRANT ALL PRIVILEGES ON DATABASE opsdb to ops;  
-```
-
-#### 登录数据库
-```
-psql -U ops -d opsdb -h 127.0.0.1 -p 5432;  
-```
-
-#### 根据实际修改opsp配置文件settings.py的数据库配置：
-
-```
-DATABASES = {  
-    'default': { 
-        'ENGINE': 'django.db.backends.psql',  
-        'NAME': 'opsdb',  
-        'USER': 'ops',  
-        'PASSWORD': 'ops@123',  
-        'HOST': '192.168.31.200',  
-        'PORT': '5432',  
-    }  
-} 
-```
-
-### for mysql
-
-#### install MySQLdb
+####### install MySQLdb
 ```
 yum install -y MySQL-python
 ```
 
-#### create db
+####### create db
 ```
 mysql
 create database opsdb default charset=utf8;
 ```
 
-#### create user
+####### create user
 ```
 grant all on opsdb.* to ops@'%' identified by "ops@123";
 ```
 
-#### 根据实际修改opsp配置文件settings.py的数据库配置：
+####### 根据实际修改opsp配置文件settings.py的数据库配置：
 
 ```
 DATABASES = {  
@@ -172,24 +117,25 @@ DATABASES = {
 } 
 ```
 
-## 5、数据库迁移
-```cd ops
+####### 数据库迁移
+```
+cd xbox
 python manage.py migrate
 ```
 
-## 6、初始化数据
+####### 初始化数据
 ```
-cd opsp/ops/
+cd xbox
 python manage.py shell < scripts/init_db.py
 ```
 
-## 7、启动服务
+####### 启动服务
 进入项目文件夹启动服务
 ```
 python manage.py runserver 0.0.0.0:8000
 ``` 
 
-## 8、登录
+####### 登录
 ```
 http://ip:8000  
 初始账户及密码：admin/admin@123
