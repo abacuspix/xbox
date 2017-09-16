@@ -188,9 +188,10 @@ class SaltState(models.Model):
 		return self.name
 
 class File(models.Model):
-	name               = models.CharField(unique=True,max_length=100)
+	name               = models.CharField(max_length=100)
 	created_by         = models.CharField(max_length=80,blank=True,null=True)
-	create_time        = models.DateTimeField(auto_now_add=True)
+	file_type          = models.CharField(max_length=20,default='upload')
+	create_time        = models.DateTimeField(auto_now=True)
 
 	class Meta:
 		db_table = 'file'

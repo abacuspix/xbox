@@ -165,6 +165,7 @@ SALT_PASSWD = 'salt_api'
 SALT_FILE_ROOTS = '/srv/salt/files'
 SALT_SCRIPTS = '/srv/salt/scripts'
 SALT_STATES = '/srv/salt/states'
+SALT_FILE_DOWNLOADS = '/var/cache/salt/master/minions'
 MONGO_IP = '192.168.3.169'
 MONGO_PORT = '27017'
 from pymongo import MongoClient

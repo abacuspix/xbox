@@ -10,7 +10,7 @@ from xbox.paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
-from xbox.settings import SALT_MASTER_HOSTNAME,SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS,SALT_SCRIPTS,SALT_STATES
+from xbox.settings import SALT_MASTER_HOSTNAME,SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS,SALT_SCRIPTS,SALT_STATES,SALT_FILE_DOWNLOADS
 from xbox.settings import MONGO_CLIENT
 from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
@@ -593,7 +593,7 @@ def delete_cmds(request):
 @role_required('hostadmin')
 def get_file(request):
 	# files = os.listdir(SALT_FILE_ROOTS)
-	files = File.objects.all()
+	files = File.objects.filter(file_type='upload')
 	if request.method == 'POST':
 		file = request.POST.get('file','')
 		remote_path = request.POST.get('remote_path','')
@@ -624,7 +624,7 @@ def put_file(request):
 			else:
 				client = request.META['REMOTE_ADDR']
 			try:
-				myfile = File.objects.create(name=file.name,created_by=user)
+				myfile = File.objects.update_or_create(name=file.name,defaults={'created_by':user})
 				if myfile:
 					error = upload_file(user,client,SALT_FILE_ROOTS,file)
 					if error:
@@ -632,7 +632,7 @@ def put_file(request):
 						messages.error(request, error)
 			except Exception as e:
 				messages.error(request, e)
-	files = File.objects.all()
+	files = File.objects.filter(file_type='upload')
 	return render(request,'opsdb/ops/get_file.html',locals())
 
 @login_required
@@ -640,11 +640,17 @@ def put_file(request):
 def delete_file(request,id):
 	try:
 		file = File.objects.get(pk=id)
-		if file:
+		if file and file.file_type == 'upload':
 			file_path = os.path.join(SALT_FILE_ROOTS,file.name)
+		else:
+			file_path = os.path.join(SALT_FILE_DOWNLOADS,file.name)
 			os.remove(file_path)
 			file.delete()
 			messages.success(request, '文件已经删除')
+			return redirect('opsdb:push_file')
+		os.remove(file_path)
+		file.delete()
+		messages.success(request, '文件已经删除')
 	except Exception as e:
 		messages.error(request, e)
 	return redirect('opsdb:get_file')
@@ -662,6 +668,14 @@ def push_file(request):
 		else:
 			client = request.META['REMOTE_ADDR']
 		result,error = get_file_from_minion(user,client,target,arg_list)
+		if not error:
+			try:
+				for tgt in target:
+					File.objects.update_or_create(name=tgt+'/files'+remote_path,defaults={'created_by':user,'file_type':'download'})
+			except Exception as e:
+				messages.error(request, e)
+	files = File.objects.filter(file_type='download')
+	url = 'http://%s:%s/downloads/'%(FTP_IP,FTP_PORT)
 	return render(request,'opsdb/ops/push_file.html',locals())
 
 @login_required
