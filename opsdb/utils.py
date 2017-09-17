@@ -50,7 +50,7 @@ def upload_file(user,client,destination,file):
 		f.close()
 		try:
 			job = {'user':user,'time':time.strftime("%Y-%m-%d %X", time.localtime()),'client':client,\
-			'target':'salt master','fun':'upload file to salt master','arg':file.name,\
+			'target':['salt master'],'fun':'upload file to salt master','arg':[file.name],\
 			'status':'','progress':'Finish','result':'Success','cjid':str(int(round(time.time() * 1000)))}
 			MONGO_CLIENT.salt.joblist.insert_one(job)
 			# result = True

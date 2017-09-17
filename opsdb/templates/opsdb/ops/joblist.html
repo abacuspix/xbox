@@ -109,9 +109,9 @@
 	                                <td id="{{job.jid}}"><small>{{job.user}}</small></td>
 	                                <td><small>{{job.time}}</small></td>
 	                                <td><small>{{job.client}}</small></td>
-	                                <td><small>{{job.target}}</small></td>
+	                                <td><small>{{job.target | join:","}}</small></td>
 	                                <td><small>{{job.fun}}</small></td>
-	                                <td><small>{{job.arg}}</small></td>
+	                                <td><small>{{job.arg | join:" "}}</small></td>
 	                                {% if job.killed %}
 	                                <th><small>{{job.killed}}</small></th>
 	                                {% else %}
