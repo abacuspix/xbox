@@ -624,7 +624,7 @@ def put_file(request):
 			else:
 				client = request.META['REMOTE_ADDR']
 			try:
-				myfile = File.objects.update_or_create(name=file.name,defaults={'created_by':user})
+				myfile,updated = File.objects.update_or_create(name=file.name,defaults={'created_by':user})
 				if myfile:
 					error = upload_file(user,client,SALT_FILE_ROOTS,file)
 					if error:
