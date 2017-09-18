@@ -151,6 +151,9 @@ class Cmd(models.Model):
 	name               = models.CharField(unique=True,max_length=100)
 	argument           = models.CharField(max_length=200,blank=True,null=True)
 	created_by         = models.CharField(max_length=80,blank=True,null=True)
+	command_type       = models.CharField(max_length=80,default='common')
+	create_time        = models.DateTimeField(auto_now_add=True)
+	update_time        = models.DateTimeField(auto_now=True)
 	comment            = models.CharField(max_length=200,blank=True,null=True)
 
 	class Meta:
@@ -197,5 +200,4 @@ class File(models.Model):
 		db_table = 'file'
 
 	def __unicode__(self):
-		return self.name						
-
+		return self.name

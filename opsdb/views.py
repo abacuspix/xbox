@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from xbox.decorators import role_required
+from xbox.decorators import role_required,black_command_check
 from xbox.paginator import my_paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
@@ -130,7 +130,8 @@ def add_host(request):
 				if hostgroups:
 					host.hostgroups = hostgroups
 				if env:
-					host.environment = env
+					host.environment = Environment.objects.get(pk=env)
+					host.save()
 			messages.success(request, '添加成功')
 			return redirect('opsdb:hosts')
 		else:
@@ -428,6 +429,7 @@ def delete_hostgroup(request):
 
 @login_required
 @role_required('hostadmin')
+@black_command_check
 def cmd(request):
 	if request.method == 'POST':
 		user = request.user.username
@@ -541,53 +543,6 @@ def save_cmd(request):
 	if request.method == 'POST':
 		argument = request.POST.get('argument','')
 	return render(request,'opsdb/ops/add_cmd.html',locals())
-
-@login_required
-@role_required('hostadmin')
-def edit_cmd(request,id):
-	cmd = Cmd.objects.get(pk=id)
-	if request.method == 'POST':
-		name = request.POST.get('name','')
-		argument = request.POST.get('argument','')
-		comment = request.POST.get('comment')
-		try:
-			if name != cmd.name:
-				cmd.name = name
-			if argument != cmd.argument:
-				cmd.argument = argument
-			if comment != cmd.comment:
-				cmd.comment = comment
-			cmd.save()
-			messages.success(request, '命令更新成功')
-			return redirect('opsdb:cmds')
-		except Exception as e:
-			messages.error(request, e)
-	else:
-		name,argument,comment = cmd.name,cmd.argument,cmd.comment
-	return render(request,'opsdb/ops/edit_cmd.html',locals())
-
-@login_required
-@role_required('hostadmin')
-def delete_cmd(request,id):
-	ret = 'success'
-	try:
-		Cmd.objects.filter(pk__in=id).delete()
-		messages.success(request, '命令已经删除')
-	except Exception as e:
-		messages.error(request, e)
-	return redirect('opsdb:cmds')
-
-@login_required
-@role_required('hostadmin')
-@csrf_exempt
-def delete_cmds(request):
-	ids = request.POST.getlist('ids[]','')
-	ret = 'success'
-	try:
-		Cmd.objects.filter(pk__in=ids).delete()
-	except Exception as e:
-		ret = str(e)
-	return HttpResponse(ret)
 
 @login_required
 @role_required('hostadmin')
@@ -953,3 +908,78 @@ def delete_state(request,id):
 	except Exception as e:
 		messages.error(request, e)
 	return redirect('opsdb:states')
+
+@login_required
+@role_required('hostadmin')
+def black_cmds(request):
+	black_command_list = Cmd.objects.filter(command_type='black')
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,cmds,page_number = my_paginator(black_command_list,page,page_number)
+	return render(request,'opsdb/ops/black_commands.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def add_black_cmd(request):
+	if request.method == 'POST':
+		name = request.POST.get('name','')
+		argument = request.POST.get('argument','')
+		comment = request.POST.get('comment')
+		try:
+			cmd,created = Cmd.objects.get_or_create(name=name,defaults={'argument':argument,'comment':comment,\
+				'created_by':request.user.username,'command_type':'black'})
+			if created:
+				messages.success(request, '命令添加成功')
+				return redirect('opsdb:black_cmds')
+			else:
+				messages.error(request, '命令名称重复')
+		except Exception as e:
+			messages.error(request, e)
+	return render(request,'opsdb/ops/add_cmd.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def edit_cmd(request,id):
+	cmd = Cmd.objects.get(pk=id)
+	if request.method == 'POST':
+		name = request.POST.get('name','')
+		argument = request.POST.get('argument','')
+		comment = request.POST.get('comment')
+		try:
+			if name != cmd.name:
+				cmd.name = name
+			if argument != cmd.argument:
+				cmd.argument = argument
+			if comment != cmd.comment:
+				cmd.comment = comment
+			cmd.save()
+			messages.success(request, '命令更新成功')
+		except Exception as e:
+			messages.error(request, e)
+		return redirect('opsdb:black_cmds')
+	else:
+		name,argument,comment = cmd.name,cmd.argument,cmd.comment
+	return render(request,'opsdb/ops/edit_cmd.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def delete_cmd(request,id):
+	ret = 'success'
+	try:
+		Cmd.objects.filter(pk__in=id).delete()
+		messages.success(request, '命令已经删除')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:black_cmds')
+
+@login_required
+@role_required('hostadmin')
+@csrf_exempt
+def delete_cmds(request):
+	ids = request.POST.getlist('ids[]','')
+	ret = 'success'
+	try:
+		Cmd.objects.filter(pk__in=ids).delete()
+	except Exception as e:
+		ret = str(e)
+	return HttpResponse(ret)
