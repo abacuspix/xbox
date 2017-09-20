@@ -94,12 +94,12 @@ yum install -y MySQL-python
 ####### create db
 ```
 mysql
-create database opsdb default charset=utf8;
+create database devops default charset=utf8;
 ```
 
 ####### create user
 ```
-grant all on opsdb.* to ops@'%' identified by "ops@123";
+grant all on devops.* to devops@'%' identified by "devops";
 ```
 
 ####### 根据实际修改opsp配置文件settings.py的数据库配置：
@@ -108,9 +108,9 @@ grant all on opsdb.* to ops@'%' identified by "ops@123";
 DATABASES = {  
     'default': { 
         'ENGINE': 'django.db.backends.mysql',  
-        'NAME': 'opsdb',  
-        'USER': 'ops',  
-        'PASSWORD': 'ops@123',  
+        'NAME': 'devops',  
+        'USER': 'devops',  
+        'PASSWORD': 'devops',
         'HOST': 'localhost',  
         'PORT': '3306',  
     }  

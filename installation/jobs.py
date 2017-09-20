@@ -12,15 +12,16 @@ from django.shortcuts import get_object_or_404
 from django_rq import job
 
 @job
-def get_info_from_vcenter(vc_id,user,password,ip,port=443):
+def get_info_from_vcenter(id,user,password,ip,port=443):
 	'''
 	return vms by cluster
 	'''
-	vc = Vcenter.objects.get(pk=vc_id)
+	vc = Vcenter.objects.get(pk=id)
 	vcenter = get_vms_by_cluster(user,password,ip,port)
 	if vcenter:
 		for datacenter,clusters in vcenter.items():
-			dc,created = Datacenter.objects.get_or_create(name=datacenter)
+			dc,created = Datacenter.objects.get_or_create(name=datacenter,vcenter_id=vc.id)
+
 			if dc:
 				dc.vcenter = vc
 				dc.save()
@@ -142,15 +143,15 @@ def boot_to_pxe(server_id):
 	ipmi_pass = server.ipmi_pass
 	if not (ipmi_ip and ipmi_user and ipmi_pass):
 		server.power = 'ipmi error'
-		server.save()
 	else:
 		ipmi = ipmitool(ipmi_ip,ipmi_pass,username=ipmi_user)
 		ipmi.chassis_status()
 		if 'on' in ipmi.output:
-			pass
+			server.power = 'on'
 		else:
 			ipmi.boot_to_pxe()
 			ipmi.chassis_on()
-		server.power = 'start'
-		server.pxe_ip = ''
-		server.save()
+			server.power = 'start'
+			server.pxe_ip = ''
+	server.save()
+

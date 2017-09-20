@@ -39,7 +39,7 @@
                         {% if k == 'Unassigned' %}
                             <button type="button" class="btn lable lable-inverse" onclick="create_raid('{{server.id}}','create_raid')">创建RAID</button>
                         {% else %}
-                            <button type="button" class="btn lable lable-inverse" onclick="delete_raid('{{server.id}}','delete_raid','{{k}}')">删除RAID</button>
+                            <button type="button btn-danger" class="btn lable lable-inverse" onclick="delete_raid('{{server.id}}','delete_raid','{{k}}')">删除RAID</button>
                         {% endif %}
                       </div>
                   </div>
@@ -82,7 +82,7 @@
     <script type="text/javascript">
       function delete_raid(server_id,fun,array) {
           layer.confirm('请确认是否要删除RAID', function(index){
-              var index = layer.load();
+              var index = layer.load(1);
               $.get("/installation/server/raid/" + server_id +'/' + fun + '/' + array,
                       function(data){
                           var obj = JSON.parse(data);

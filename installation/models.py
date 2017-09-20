@@ -108,8 +108,7 @@ class PreSystem(models.Model):
         return self.profile
 
 class Vcenter(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="vc_id")
-    name               = models.CharField(max_length=50,blank=True,null=True,db_column="vc_name")
+    name               = models.CharField(max_length=50,blank=True,null=True)
     ip                 = models.GenericIPAddressField(blank=True,null=True,unique=True)
     port               = models.CharField(max_length=10,default='443')
     user               = models.CharField(max_length=50,blank=True,null=True)
@@ -122,15 +121,14 @@ class Vcenter(models.Model):
         return self.name
 
 class Datastore(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="datastore_id")
-    name               = models.CharField(max_length=50,blank=True,null=True,db_column="datastore_name")
+    name               = models.CharField(max_length=50,blank=True,null=True)
     capacity           = models.CharField(max_length=50,blank=True,null=True)
     free_space         = models.CharField(max_length=50,blank=True,null=True)
     provisioned        = models.CharField(max_length=50,blank=True,null=True)
     uncommitted        = models.CharField(max_length=50,blank=True,null=True)
     hosts              = models.IntegerField(blank=True,null=True,default=0)
     vms                = models.IntegerField(blank=True,null=True,default=0)
-    vcenter            = models.ForeignKey(Vcenter,blank=True, null=True,on_delete=models.PROTECT)
+    vcenter            = models.ForeignKey(Vcenter,blank=True, null=True)
 
     class Meta:
         db_table = 'vm_datastore'
@@ -139,9 +137,8 @@ class Datastore(models.Model):
         return self.name
 
 class Datacenter(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="dc_id")
-    name               = models.CharField(max_length=50,blank=True,null=True,db_column="dc_name")
-    vcenter            = models.ForeignKey(Vcenter,blank=True, null=True,on_delete=models.PROTECT)
+    name               = models.CharField(max_length=50,blank=True,null=True)
+    vcenter            = models.ForeignKey(Vcenter,blank=True,null=True)
 
     class Meta:
         db_table = 'vm_datacenter'
@@ -150,9 +147,8 @@ class Datacenter(models.Model):
         return self.name
           
 class Cluster(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="ha_id")
-    name               = models.CharField(max_length=50,blank=True,null=True,db_column="ha_name")
-    datacenter         = models.ForeignKey(Datacenter,blank=True, null=True,on_delete=models.PROTECT)
+    name               = models.CharField(max_length=50,blank=True,null=True)
+    datacenter         = models.ForeignKey(Datacenter,blank=True, null=True)
 
     class Meta:
         db_table = 'vm_cluster'
@@ -161,10 +157,9 @@ class Cluster(models.Model):
         return self.name
 
 class Host(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="host_id")
     ip                 = models.GenericIPAddressField(blank=True,null=True,unique=True)    
-    cluster            = models.ForeignKey(Cluster,blank=True, null=True,on_delete=models.PROTECT)
-    server             = models.OneToOneField(Server,blank=True, null=True, on_delete=models.PROTECT)
+    cluster            = models.ForeignKey(Cluster,blank=True, null=True)
+    server             = models.OneToOneField(Server,blank=True, null=True)
 
     class Meta:
         db_table = 'vm_host'
@@ -173,8 +168,7 @@ class Host(models.Model):
         return self.ip
 
 class Guest(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="guest_id")
-    name               = models.CharField(max_length=50,blank=True,null=True,db_column="guest_name")
+    name               = models.CharField(max_length=50,blank=True,null=True)
     annotation         = models.CharField(max_length=200,blank=True,null=True)
     cpu                = models.IntegerField(blank=True,null=True,default=0)
     diskGB             = models.CharField(max_length=50,blank=True,null=True)
@@ -184,8 +178,8 @@ class Guest(models.Model):
     path               = models.CharField(max_length=50,blank=True,null=True)
     status             = models.CharField(max_length=50,blank=True,null=True)
     is_template        = models.BooleanField(default=False)
-    host               = models.ForeignKey(Host,blank=True, null=True,on_delete=models.PROTECT)
-    datastore          = models.ForeignKey(Datastore,blank=True, null=True,on_delete=models.PROTECT)
+    host               = models.ForeignKey(Host,blank=True, null=True)
+    datastore          = models.ForeignKey(Datastore,blank=True, null=True)
 
     class Meta:
         db_table = 'vm_guest'
@@ -194,12 +188,12 @@ class Guest(models.Model):
         return self.name
 
 class Vnet(models.Model):
-    mac                = models.CharField(max_length=50,primary_key=True,db_column="mac")
+    mac                = models.CharField(max_length=50,primary_key=True)
     connected          = models.CharField(max_length=50,blank=True,null=True)
     ip                 = models.GenericIPAddressField(blank=True,null=True,unique=True)
     netlabel           = models.CharField(max_length=100,blank=True,null=True)
     prefix             = models.CharField(max_length=50,blank=True,null=True)   
-    guest              = models.ForeignKey(Guest,blank=True, null=True,on_delete=models.PROTECT)
+    guest              = models.ForeignKey(Guest,blank=True, null=True)
 
     class Meta:
         db_table = 'vm_guest_net'
@@ -208,7 +202,6 @@ class Vnet(models.Model):
         return self.mac
 
 class Cobbler(models.Model):
-    id                 = models.AutoField(primary_key=True,db_column="cobbler_id")
     ip                 = models.GenericIPAddressField(blank=True,null=True,unique=True)
     port               = models.IntegerField(blank=True,null=True,default=80)
     user               = models.CharField(max_length=50,blank=True,null=True)
@@ -219,10 +212,6 @@ class Cobbler(models.Model):
     
     def __unicode__(self):
         return self.ip
-
-
-
-
 
 
 

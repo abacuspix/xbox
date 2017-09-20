@@ -279,7 +279,7 @@
           layer.open({
             type: 2,
             title: '更新Vcenter信息',
-            area : ['500px','400px'],
+            area : ['60%','70%'],
             content: '/installation/vm/edit_vcenter/' + id,
             end: function(){
                window.location.reload();
@@ -289,7 +289,7 @@
 
     function delete_vcenter(id){   
           layer.confirm('请确认是否要删除', function(index){
-                  $.get("/vm/delete_vcenter/"+id,function(data){
+                  $.get("/installation/vm/delete_vcenter/"+id,function(data){
                     if (data == '')
                     {
                       layer.msg('删除成功',function(){

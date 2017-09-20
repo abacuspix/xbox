@@ -79,6 +79,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+DJANGO_EASY_AUDIT_UNREGISTERED_CLASSES_EXTRA = ['installation.server','installation.disk','installation.nic']
+
 ROOT_URLCONF = 'xbox.urls'
 
 TEMPLATES = [
