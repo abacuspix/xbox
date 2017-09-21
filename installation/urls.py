@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^server/delete/$',views.server_delete,name='server_delete'),
     url(r'^server/edit/(\w+)/$',views.server_edit,name='server_edit'),
     url(r'^server/raid/(\w+)/(\w+)/(\w*)',views.server_raid,name='server_raid'),
+    url(r'^server/confirm_to_prod/(\w+)/$',views.confirm_to_prod,name='confirm_to_prod'),
     url(r'^select_cab/',views.select_cab,name='select_cab'),
     url(r'^server/status/',views.server_change_status,name='server_change_status'),
     url(r'^server/power/$',views.server_power,name='server_power'),

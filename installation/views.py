@@ -16,7 +16,10 @@ from .cobbler_api import CobblerAPI
 from .jobs import get_info_from_vcenter,chassis_off,chassis_install,boot_to_pxe
 from django.contrib.auth.decorators import login_required
 from xbox.decorators import role_required
-
+from opsdb.models import Environment
+from xbox.settings import FTP_IP,FTP_PORT
+from xbox.sshapi import remote_cmd
+from opsdb.models import Host
 # Create your views here.
 @csrf_exempt
 def post_server_info(request):
@@ -209,6 +212,55 @@ def server_change_status(request):
 			# raise e
 			ret[server_id] = str(e)
 	return HttpResponse(json.dumps(ret))
+
+def confirm_to_prod(request,id):
+	server = get_object_or_404(Server,pk=id)
+	if request.method == 'GET':
+		envs = Environment.objects.all()
+	else:
+		ip = request.POST.get('ip','')
+		env = request.POST.get('env','')
+		salt = request.POST.get('salt','')
+		if salt:
+			port = request.POST.get('port','')
+			user = request.POST.get('username','')
+			passwd = request.POST.get('password','')
+			if port and user and passwd:
+				cmd = "curl -s http://%s:%s/install-minion.sh | sh 2>&1"%(FTP_IP,FTP_PORT)
+				ret = remote_cmd(cmd,ip,port=int(port),user=user,passwd=passwd)
+				if ret['status'] and not ret['err']:
+					host,created = Host.objects.get_or_create(ip=ip)
+					if host:
+						if env:
+							host.environment = Environment.objects.get(pk=env)
+							host.save()
+				else:
+					messages.error(request, ret['err'])
+					return render(request,'installation/ph/confirm_to_prod.html',locals())
+			else:
+				messages.error(request, '端口，用户或密码为空，无法安装salt')
+				return render(request,'installation/ph/confirm_to_prod.html',locals())
+		else:
+			host,created = Host.objects.update_or_create(server_id=server.id,defaults={'ip':ip})
+			if host:
+				if env:
+					host.environment = Environment.objects.get(pk=env)
+					host.save()
+		pre_system = server.presystem
+		if pre_system:
+			try:
+				server.serverstatus = ServerStatus.objects.get(server_status_type='running')
+				server.prod_ip = ip
+				server.save()
+				cobbler = init_cobbler()
+				result = cobbler.del_system(pre_system.hostname)
+				if result['result']:
+					pre_system.delete()
+			except Exception as e:
+				messages.error(request, e)
+	return render(request,'installation/ph/confirm_to_prod.html',locals())
+	
+	
 
 def server_raid(request,server_id,fun,array):
 	server = get_object_or_404(Server,pk=server_id)
@@ -468,7 +520,7 @@ def vcenter(request):
 	datastores = Datastore.objects.all()
 	datacenters = Datacenter.objects.all()
 	clusters = Cluster.objects.all()
-	hosts = Host.objects.all()
+	hosts = VmHost.objects.all()
 	guests = Guest.objects.all()
 	return render(request,'installation/vcenter.html',locals())
 

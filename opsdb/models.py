@@ -79,6 +79,7 @@ class Host(models.Model):
 	is_virtual    = models.CharField(max_length=30,blank=True,null=True)
 	minion_id     = models.CharField(max_length=100,unique=True,blank=True,null=True)
 	minion_status = models.CharField(max_length=1,choices=minion_status_choices,default="N")
+	server_id     = models.CharField(max_length=200,blank=True,null=True,default='server_id')
 	comment       = models.CharField(max_length=200,blank=True,null=True)
 	hostgroups    = models.ManyToManyField(HostGroup)
 	applications  = models.ManyToManyField(Application)
@@ -90,7 +91,7 @@ class Host(models.Model):
 		db_table = 'host'
 		
 	def __unicode__(self):
-		return self.name
+		return self.ip
 
 class Rule(models.Model):
 	group         = models.OneToOneField(Group,related_name='rule', on_delete=models.CASCADE)

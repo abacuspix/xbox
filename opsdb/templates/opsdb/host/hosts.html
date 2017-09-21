@@ -156,7 +156,16 @@
                                     <td id="{{host.id}}"><small><a href="{% url 'opsdb:host' host.minion_id %}">{{host.hostname}}</a></small></td>
                                     <td><small>{{host.ip}}</small></td>
                                     <td><small data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="{{host.os}}">{{host.os | truncatewords:2 }}</small></td>
-                                    <td><small>{{host.is_virtual}}</small></td>
+                                    <td>
+                                      <small>
+                                      {% if host.is_virtual == 'physical' %}
+                                        <a onclick="show_server('{{host.server_id}}')" style="text-decoration:underline">
+                                        {{host.is_virtual | capfirst }}</a>
+                                      {% else %}
+                                        {{host.is_virtual}}
+                                      {% endif %}
+                                      </small>
+                                    </td>
                                     {% if host.minion_status == 'O' %}
                                     <td><small><span class="badge bg-success">Ok</span></small></td>
                                     {% elif host.minion_status == 'E' %}
@@ -261,6 +270,18 @@
                       
             }); 
         }
+      }
+
+    function show_server(server_id){
+        var index = layer.open({
+            type: 2,
+            title: "服务器详细信息",
+            area: ['70%', '80%'],
+            shadeClose: true,
+            shift: 5,
+            moveOut: true,
+            content: '/installation/server/detail/' + server_id
+          });
       }
 
     </script>

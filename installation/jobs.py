@@ -3,7 +3,7 @@
 
 from __future__ import absolute_import, unicode_literals
 import time
-from .models import Vcenter,Datastore,Datacenter,Cluster,Host,Guest,Vnet,Server,ServerStatus
+from .models import Vcenter,Datastore,Datacenter,Cluster,VmHost,Guest,Vnet,Server,ServerStatus
 from .getvmsbycluster import get_vms_by_cluster
 from .getdatastorebyname import get_ds_from_vcenter
 from .clone_vm import create_vm_by_template
@@ -31,7 +31,7 @@ def get_info_from_vcenter(id,user,password,ip,port=443):
 						clu.datacenter = dc
 						clu.save()
 						for host,vms in hosts.items():
-							ht,created = Host.objects.get_or_create(ip=host)
+							ht,created = VmHost.objects.get_or_create(ip=host)
 							if ht:
 								ht.cluster = clu
 								try:

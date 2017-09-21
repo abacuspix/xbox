@@ -156,7 +156,7 @@ class Cluster(models.Model):
     def __unicode__(self):
         return self.name
 
-class Host(models.Model):
+class VmHost(models.Model):
     ip                 = models.GenericIPAddressField(blank=True,null=True,unique=True)    
     cluster            = models.ForeignKey(Cluster,blank=True, null=True)
     server             = models.OneToOneField(Server,blank=True, null=True)
@@ -178,7 +178,7 @@ class Guest(models.Model):
     path               = models.CharField(max_length=50,blank=True,null=True)
     status             = models.CharField(max_length=50,blank=True,null=True)
     is_template        = models.BooleanField(default=False)
-    host               = models.ForeignKey(Host,blank=True, null=True)
+    host               = models.ForeignKey(VmHost,blank=True, null=True)
     datastore          = models.ForeignKey(Datastore,blank=True, null=True)
 
     class Meta:
