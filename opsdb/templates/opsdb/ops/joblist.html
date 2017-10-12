@@ -110,7 +110,7 @@
 	                                <td><small>{{job.time}}</small></td>
 	                                <td><small>{{job.client}}</small></td>
 	                                <!-- <td><small>{{job.target | join:","}}</small></td> -->
-	                                <td><small>{{job.target}}</small></td>
+	                                <td><small data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="{{job.target}}">{{job.target | truncatewords:2}}</small></td>
 	                                <td><small>{{job.fun}}</small></td>
 	                                <!-- <td><small>{{job.arg | join:" "}}</small></td> -->
 	                                <td><small>{{job.arg}}</small></td>
@@ -121,9 +121,9 @@
 	                               	{% endif %}
 	                                <!-- <th><small>{{job.status}}</small></th> -->
 	                                {% if job.cjid %}
-	                                <td><small><a onclick="show_job_result('job_cjid','{{job.cjid}}','{{job.target | join:','}}')">点击查看报告</a></small></td>
+	                                <td><small><a onclick="show_job_result('job_cjid','{{job.cjid}}','{{job.target }}')">点击查看报告</a></small></td>
 	                               	{% else %}
-	                               	<td><small><a onclick="show_job_result('job_jid','{{job.jid}}','{{job.target | join:','}}')">点击查看报告</a></small></td>
+	                               	<td><small><a onclick="show_job_result('job_jid','{{job.jid}}','{{job.target }}')">点击查看报告</a></small></td>
 	                               	{% endif %}
 	                              </tr>
 	                            {% endfor %}
