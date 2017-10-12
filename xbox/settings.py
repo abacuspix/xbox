@@ -47,7 +47,7 @@ RQ_QUEUES = {
 SECRET_KEY = '%qijyrvy)-+fmv&twl&vikpw1+z6$9dbut-!!(qcyeb42&zd+*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -156,7 +156,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
 
 FTP_IP = '192.168.3.167'
 FTP_PORT = '80'

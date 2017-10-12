@@ -189,47 +189,52 @@ def host(request,id):
 	if hosts:
 		for host in hosts:
 			ret = host.get('return',None)
-			# operation system info
-			grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
-			grains['os']['fqdn'] = ret.get('fqdn',None)
-			grains['os']['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
-			grains['os']['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
-			grains['os']['disk-usage'] = ret.get('disk-usage',None)
-			grains['os']['selinux'] = ret.get('selinux',None)
-			grains['os']['fqdn_ip4'] = ret.get('fqdn_ip4',None)
-			grains['os']['ip4_interfaces'] = ret.get('ip4_interfaces',None)
-			grains['os']['ip6_interfaces'] = ret.get('ip6_interfaces',None)
-			grains['os']['routes'] = ret.get('routes',None)
-			grains['os']['dns'] = ret.get('dns',None)
-			grains['os']['ntp'] = ret.get('ntp',None)
-			grains['os']['iptable'] = ret.get('iptable',None)
-			grains['os']['systemd'] = ret.get('systemd',None)
-			grains['os']['lsb_distrib'] = {'id':ret['lsb_distrib_id'],'codename':ret['lsb_distrib_codename']}
-			os = json2html.convert(json = grains['os'])
+			os_family = ret.get('os_family',None)
+			if os_family == 'Windows':
+				pass
+			else:
+				os_family = "Linux"
+				# operation system info
+				grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
+				grains['os']['fqdn'] = ret.get('fqdn',None)
+				grains['os']['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
+				grains['os']['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
+				grains['os']['disk-usage'] = ret.get('disk-usage',None)
+				grains['os']['selinux'] = ret.get('selinux',None)
+				grains['os']['fqdn_ip4'] = ret.get('fqdn_ip4',None)
+				grains['os']['ip4_interfaces'] = ret.get('ip4_interfaces',None)
+				grains['os']['ip6_interfaces'] = ret.get('ip6_interfaces',None)
+				grains['os']['routes'] = ret.get('routes',None)
+				grains['os']['dns'] = ret.get('dns',None)
+				grains['os']['ntp'] = ret.get('ntp',None)
+				grains['os']['iptable'] = ret.get('iptable',None)
+				grains['os']['systemd'] = ret.get('systemd',None)
+				grains['os']['lsb_distrib'] = {'id':ret['lsb_distrib_id'],'codename':ret['lsb_distrib_codename']}
+				os = json2html.convert(json = grains['os'])
 
-			# software info
-			grains['software'] = ret.get('software',None)
-			users = json2html.convert(json = grains['software'])
+				# software info
+				grains['software'] = ret.get('software',None)
+				users = json2html.convert(json = grains['software'])
 
-			# system user info
-			grains['users'] = ret.get('users',None)
-			users = json2html.convert(json = grains['users'])
+				# system user info
+				grains['users'] = ret.get('users',None)
+				users = json2html.convert(json = grains['users'])
 
-			# hardware info
-			grains['hardware']['virtual'] = ret.get('virtual',None)
-			grains['hardware']['serialnumber'] = ret.get('serialnumber',None)
-			grains['hardware']['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
-			grains['hardware']['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
-			grains['hardware']['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
-			grains['hardware']['HBA'] = ret.get('HBA',None)
-			hardware = json2html.convert(json = grains['hardware'])
+				# hardware info
+				grains['hardware']['virtual'] = ret.get('virtual',None)
+				grains['hardware']['serialnumber'] = ret.get('serialnumber',None)
+				grains['hardware']['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
+				grains['hardware']['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
+				grains['hardware']['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
+				grains['hardware']['HBA'] = ret.get('HBA',None)
+				hardware = json2html.convert(json = grains['hardware'])
 
-			# user cron info
-			cron = json2html.convert(json = grains['cron'])
+				# user cron info
+				cron = json2html.convert(json = grains['cron'])
 
 			# summary info
 			summary = json2html.convert(json = ret)
-
+			print ret
 	return render(request,'opsdb/host/host.html',locals())
 
 @login_required

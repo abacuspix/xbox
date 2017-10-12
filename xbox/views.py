@@ -255,7 +255,7 @@ def group_has_users(request,id):
 	user_list = Group.objects.get(pk=id).user_set.all()
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	users,page_number = paginator(user_list,page,page_number)
+	paginator,users,page_number = my_paginator(user_list,page,page_number)
 	return render(request,'users.html',locals())
 
 @login_required

@@ -42,38 +42,40 @@
         </div>
 
         <section class="panel">
-            <header class="panel-heading tab-bg-dark-navy-blue ">
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a data-toggle="tab" href="#os" style="left: 15px;">操作系统</a>
-                    </li>
-                    <li class="">
-                        <a data-toggle="tab" href="#user" style="left: 15px;">系统用户</a>
-                    </li>
-                    <li class="">
-                        <a data-toggle="tab" href="#software" style="left: 15px;">系统软件</a>
-                    </li>
-                    <li class="">
-                        <a data-toggle="tab" href="#hardware" style="left: 15px;">系统硬件</a>
-                    </li>
-                    <li class="">
-                        <a data-toggle="tab" href="#cron" style="left: 15px;">定时作业</a>
-                    </li>
-                    <li class="">
-                        <a data-toggle="tab" href="#summary" style="left: 15px;">概览</a>
-                    </li>
-                </ul>
-            </header>
-            <div class="panel-body">
-                <div class="tab-content">
-                    <div id="os" class="tab-pane active">{% autoescape off %}{{os}}{% endautoescape %}</div>
-                    <div id="user" class="tab-pane">{% autoescape off %}{{users}}{% endautoescape %}</div>
-                    <div id="software" class="tab-pane">{% autoescape off %}{{software}}{% endautoescape %}</div>
-                    <div id="hardware" class="tab-pane">{% autoescape off %}{{hardware}}{% endautoescape %}</div>
-                    <div id="cron" class="tab-pane">{% autoescape off %}{{cron}}{% endautoescape %}</div>
-                    <div id="summary" class="tab-pane">{% autoescape off %}{{summary}}{% endautoescape %}</div>
+                <header class="panel-heading tab-bg-dark-navy-blue ">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a data-toggle="tab" href="#summary" style="left: 15px;">概览</a>
+                        </li>
+                        {% if os_family == 'Linux'%}
+                        <li class="">
+                            <a data-toggle="tab" href="#os" style="left: 15px;">操作系统</a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#user" style="left: 15px;">系统用户</a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#software" style="left: 15px;">系统软件</a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#hardware" style="left: 15px;">系统硬件</a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#cron" style="left: 15px;">定时作业</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </header>
+                <div class="panel-body">
+                    <div class="tab-content">
+                        <div id="summary" class="tab-pane active">{% autoescape off %}{{summary}}{% endautoescape %}</div>
+                        <div id="os" class="tab-pane">{% autoescape off %}{{os}}{% endautoescape %}</div>
+                        <div id="user" class="tab-pane">{% autoescape off %}{{users}}{% endautoescape %}</div>
+                        <div id="software" class="tab-pane">{% autoescape off %}{{software}}{% endautoescape %}</div>
+                        <div id="hardware" class="tab-pane">{% autoescape off %}{{hardware}}{% endautoescape %}</div>
+                        <div id="cron" class="tab-pane">{% autoescape off %}{{cron}}{% endautoescape %}</div>
+                    </div>
                 </div>
-            </div>
         </section>
         <!-- page end-->
     </section>
