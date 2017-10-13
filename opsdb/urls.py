@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'^ops/joblist/$',views.joblist,name='joblist'),
     url(r'^ops/job_cjid/(\d+)/$',views.job_cjid,name='job_cjid'),
     url(r'^ops/job_jid/(\d+)/$',views.job_jid,name='job_jid'),
+    url(r'^ops/search_job/$',views.search_job,name='search_job'),
     url(r'^ops/cmds/$',views.cmds,name='cmds'),
     url(r'^ops/cmds/black/$',views.black_cmds,name='black_cmds'),
     url(r'^ops/cmds/add/$',views.add_cmd,name='add_cmd'),

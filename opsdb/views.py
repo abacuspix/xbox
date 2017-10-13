@@ -234,7 +234,6 @@ def host(request,id):
 
 			# summary info
 			summary = json2html.convert(json = ret)
-			print ret
 	return render(request,'opsdb/host/host.html',locals())
 
 @login_required
@@ -513,6 +512,31 @@ def job_cjid(request,cjid):
 		return render(request,'opsdb/ops/show_state_result.html',locals())
 	else:
 		return render(request,'opsdb/ops/jobresult.html',locals())
+
+def search_job(request):
+	if request.method == 'POST':
+		from_tm = request.POST.get('from','')
+		to_tm = request.POST.get('to','')
+		users = request.POST.get('users','')
+		clients = request.POST.get('clients','')
+		targets = request.POST.get('targets','')
+		keyword = request.POST.get('keyword','')
+		if keyword:
+			sjobs = MONGO_CLIENT.salt.joblist.find({'$or':[{'target':{'$regex':keyword, '$options':'i'}},\
+				{'client':{'$regex':keyword, '$options':'i'}},\
+				{'fun':{'$regex':keyword, '$options':'i'}},\
+				{'user':{'$regex':keyword, '$options':'i'}}]}).sort([('_id',-1)])
+		else:
+			sjobs = MONGO_CLIENT.salt.joblist.find({'time':{'$gte':from_tm,'$lte':to_tm},\
+				'$or':[{'target':{'$regex':targets, '$options':'i'}},\
+				{'client':{'$regex':clients, '$options':'i'}},\
+				{'user':{'$regex':users, '$options':'i'}}]}).sort([('_id',-1)])
+		job_list = [job for job in sjobs]
+		page_number =  request.GET.get('page_number')
+		page = request.GET.get('page')
+		paginator,jobs,page_number = my_paginator(job_list,page,page_number)
+		return render(request,'opsdb/ops/joblist.html',locals())
+	return render(request,'opsdb/ops/search_job.html')
 
 @login_required
 @role_required('hostadmin')

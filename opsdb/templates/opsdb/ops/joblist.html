@@ -53,9 +53,15 @@
 	                              <button type="button" class="btn label label-inverse" onclick="kill_job()"><i class="icon-stop"></i> Kill Job</button>
 	                           </div>
 
-	                           <!--  <div class="btn-group">
-	                              <button type="button" class="btn label label-inverse" onclick="salt_run()"><i class="icon-search"></i> 搜索</button>
+	                           <!-- <div class="btn-group">
+	                              <a href="{% url 'opsdb:search_job' %}"><button type="button" class="btn label label-inverse"><i class="icon-search"></i> 精确搜索</button></a>
 	                           </div> -->
+	                           <div class="btn-group">
+	                                <form action="{% url 'opsdb:search_job' %}" method="post">
+	                                  {% csrf_token %}
+	                                  <input type="text" class="form-control search" placeholder="模糊查询" name="keyword">
+	                                </form>
+                               </div>
 
 	                           <ul class="unstyled inbox-pagination">
 	                               <li>
@@ -182,6 +188,17 @@
             });
             return ids
       }
+
+    //   function search_job(){
+    //     var index = layer.open({
+    //         type: 2,
+    //         title: '操作记录搜索',
+    //         area: ['70%', '60%'],
+    //         shadeClose: true,
+    //         shift: 1,
+    //         content: 'https://www.baidu.com'
+    //       });
+    // }
 
       function show_job_result(url,job_id,target){
         var index = layer.open({
