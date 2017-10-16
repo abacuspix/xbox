@@ -68,4 +68,7 @@ urlpatterns = [
     url(r'^ops/states/upload/$',views.upload_state,name='upload_state'),
     url(r'^ops/states/deploy/(\d+)/$',views.deploy_state,name='deploy_state'),
     url(r'^ops/states/delete/(\d+)/$',views.delete_state,name='delete_state'),
+    url(r'^ops/cron/$',views.cron,name='cron'),
+    url(r'^ops/cron/add/$',views.add_cron,name='add_cron'),
+    url(r'^ops/cron/delete/(.+)/$',views.delete_cron,name='delete_cron'),
 ]

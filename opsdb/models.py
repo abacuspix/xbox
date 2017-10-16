@@ -202,3 +202,23 @@ class File(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+# class Cron(models.Model):
+# 	cron_type_choices  = (("C","command"),("S","script"))
+# 	cron_id            = models.CharField(max_length=100)
+# 	cron_type          = models.CharField(max_length=1,choices=cron_type_choices,default="C")
+# 	cron_string        = models.CharField(max_length=200)
+# 	target             = models.TextField()
+# 	arg_list           = models.CharField(max_length=200)
+# 	create_time        = models.DateTimeField(auto_now_add=True)
+# 	create_by          = models.CharField(max_length=200,default="")
+# 	description        = models.TextField()
+
+# 	class Meta:
+# 		db_table = 'cron'
+
+# 	def __unicode__(self):
+# 		return self.cron_id
+
+
+		

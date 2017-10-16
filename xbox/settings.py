@@ -174,6 +174,10 @@ MONGO_PORT = '27017'
 from pymongo import MongoClient
 MONGO_CLIENT = MongoClient(MONGO_IP,int(MONGO_PORT))
 
+from redis import Redis
+from rq_scheduler import Scheduler
+scheduler = Scheduler(connection=Redis())
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

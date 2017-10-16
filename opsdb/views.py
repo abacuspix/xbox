@@ -12,6 +12,7 @@ from .models import *
 from xbox.settings import FTP_IP,FTP_PORT
 from xbox.settings import SALT_MASTER_HOSTNAME,SALT_IP,SALT_PORT,SALT_USER,SALT_PASSWD,SALT_FILE_ROOTS,SALT_SCRIPTS,SALT_STATES,SALT_FILE_DOWNLOADS
 from xbox.settings import MONGO_CLIENT
+from xbox.settings import scheduler
 from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
 from json2html import *
@@ -21,6 +22,7 @@ from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_min
 import os
 import collections
 import json
+from .jobs import myfun
 # Create your views here.
 
 @login_required
@@ -1012,3 +1014,51 @@ def delete_cmds(request):
 	except Exception as e:
 		ret = str(e)
 	return HttpResponse(ret)
+
+@login_required
+@role_required('hostadmin')
+def cron(request):
+	job_instances = scheduler.get_jobs()
+	page_number =  request.GET.get('page_number')
+	page = request.GET.get('page')
+	paginator,jobs,page_number = my_paginator(job_instances,page,page_number)
+	return render(request,'opsdb/cron/joblist.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def add_cron(request):
+	if request.method == 'POST':
+		cron_string = request.POST.get('cron_string','')
+		cron_type = request.POST.get('cron_type','')
+		try:
+			user = 'cron'
+			if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+				client =  request.META['HTTP_X_FORWARDED_FOR']  
+			else:
+				client = request.META['REMOTE_ADDR']
+			arg_list = request.POST.get('cmd','') if request.POST.get('cmd','') else 'echo hello'
+			hosts = request.POST.get('hosts','')
+			target = hosts.split(',')
+			if cron_type == 'command':
+				job = scheduler.cron(cron_string,func=exacute_cmd,args=[user,client,target,arg_list],repeat=None,queue_name='default')
+			else:
+				job = scheduler.cron(cron_string,func=run_script,args=[user,client,target,arg_list,True],repeat=None,queue_name='default')
+			if job:
+				messages.success(request, '定时任务添加成功')
+				return redirect('opsdb:cron')
+			else:
+				messages.error(request, '定时任务添加失败')
+		except Exception as e:
+			messages.error(request, e)
+	return render(request,'opsdb/cron/add_cron.html',locals())
+
+@login_required
+@role_required('hostadmin')
+def delete_cron(request,job_id):
+	ret = 'success'
+	try:
+		scheduler.cancel(job_id)
+		messages.success(request, '定时任务已经删除')
+	except Exception as e:
+		messages.error(request, e)
+	return redirect('opsdb:cron')
