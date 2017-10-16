@@ -22,7 +22,6 @@ from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_min
 import os
 import collections
 import json
-from .jobs import myfun
 # Create your views here.
 
 @login_required
@@ -1019,9 +1018,14 @@ def delete_cmds(request):
 @role_required('hostadmin')
 def cron(request):
 	job_instances = scheduler.get_jobs()
+	job_list = []
+	for job in job_instances:
+		job_list.append({'id':job.id,'cron_string':job.meta['cron_string'],'targets':','.join(job.args[2]),\
+			'arg':job.args[3],'created_at':job.created_at.strftime("%Y-%m-%d %H:%M:%S"),\
+			'last_exacuted':job.ended_at.strftime("%Y-%m-%d %H:%M:%S") if job.ended_at else ''})
 	page_number =  request.GET.get('page_number')
 	page = request.GET.get('page')
-	paginator,jobs,page_number = my_paginator(job_instances,page,page_number)
+	paginator,jobs,page_number = my_paginator(job_list,page,page_number)
 	return render(request,'opsdb/cron/joblist.html',locals())
 
 @login_required

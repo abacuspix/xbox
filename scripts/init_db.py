@@ -53,3 +53,17 @@ try:
     print '*************',cobbler.user,cobbler.ip,cobbler.password,'*************'
 except Exception as e:
     print e
+
+from xbox.settings import scheduler
+from opsdb.jobs import check_minion_status,update_grains
+try:
+    job1 = scheduler.cron('*/10 * * * *',func=check_minion_status,args=['','',['all'],'checking minions status'],repeat=None,queue_name='default')
+    print job1
+    job2 = scheduler.cron('0 0 */3 * *',func=update_grains,args=['','',['all'],'updating grains'],repeat=None,queue_name='default')
+    print job2
+except Exception as e:
+    print e
+
+
+
+
