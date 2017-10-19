@@ -123,7 +123,7 @@ def add_host(request):
 		zabbix = request.POST.get('zabbix','')
 		hostgroups = request.POST.getlist('hostgroups','')
 		env = request.POST.get('env','')
-		cmd = "curl -s http://%s:%s/install-minion.sh | sh 2>&1"%(FTP_IP,FTP_PORT)
+		cmd = "curl -s http://%s:%s/install-agent.sh | sh 2>&1"%(FTP_IP,FTP_PORT)
 		ret = remote_cmd(cmd,ip,port=int(port),user=user,passwd=passwd)
 		if ret['status'] and not ret['err']:
 			host,created = Host.objects.get_or_create(ip=ip)
