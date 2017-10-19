@@ -71,4 +71,5 @@ urlpatterns = [
     url(r'^ops/cron/$',views.cron,name='cron'),
     url(r'^ops/cron/add/$',views.add_cron,name='add_cron'),
     url(r'^ops/cron/delete/(.+)/$',views.delete_cron,name='delete_cron'),
+    url(r'^metrics/insert/$',views.metric_to_mongo,name='metric_to_mongo'),
 ]

@@ -1066,3 +1066,13 @@ def delete_cron(request,job_id):
 	except Exception as e:
 		messages.error(request, e)
 	return redirect('opsdb:cron')
+
+@csrf_exempt
+def metric_to_mongo(request):
+	host_info = json.loads(request.body)
+	try:
+		MONGO_CLIENT.salt.metrics.insert_one(host_info)
+		ret = 'metric_to_mongo'
+	except Exception as e:
+		ret = str(e)
+	return HttpResponse(ret)
