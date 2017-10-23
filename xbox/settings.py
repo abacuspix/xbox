@@ -156,7 +156,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-#STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
+STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
 
 FTP_IP = '192.168.3.167'
 FTP_PORT = '80'

@@ -72,4 +72,9 @@ urlpatterns = [
     url(r'^ops/cron/add/$',views.add_cron,name='add_cron'),
     url(r'^ops/cron/delete/(.+)/$',views.delete_cron,name='delete_cron'),
     url(r'^metrics/insert/$',views.metric_to_mongo,name='metric_to_mongo'),
+    url(r'^metrics/show_host/(.+)/(.+)/$',views.show_host,name='show_host'),
+    url(r'^metrics/show_performance/(.+)/(.+)/$',views.show_performance,name='show_performance'),
+    url(r'^metrics/show_user/(.+)/(.+)/$',views.show_user,name='show_user'),
+    url(r'^metrics/show_socket/(.+)/(.+)/$',views.show_socket,name='show_socket'),
+    url(r'^metrics/show_process/(.+)/(.+)/$',views.show_process,name='show_process'),
 ]

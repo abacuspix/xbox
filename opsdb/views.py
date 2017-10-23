@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.shortcuts import redirect,HttpResponse
+from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.template import loader
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from xbox.decorators import role_required,black_command_check
@@ -22,6 +24,9 @@ from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_min
 import os
 import collections
 import json
+from collections import OrderedDict
+from pyecharts import Line,Grid,Page
+from pyecharts.constants import DEFAULT_HOST
 # Create your views here.
 
 @login_required
@@ -1076,3 +1081,133 @@ def metric_to_mongo(request):
 	except Exception as e:
 		ret = str(e)
 	return HttpResponse(ret)
+
+def show_host(request,ip,hostname):
+	hosts = MONGO_CLIENT.salt.metrics.find({'ip':ip,'hostname':hostname}).sort([("_id", -1)]).limit(1)
+	for host in hosts:
+		# metrics = {'ip':host['ip'],'hostname':host['hostname'],'platform':host['platform'],\
+		# 'cpus':host['cpus'],'mem_total':host['mem']['total'],'swap_total':host['mem']['swap_total'],\
+		# 'disk':host['disk'],'uptime':host['uptime'],'minion_status':host['minion_status']}
+		# print json.dumps(metrics)
+		# disk = host['disk']
+		# order_disk = OrderedDict(
+		# 	[('Filesystem',disk['Filesystem']),('Size',disk['Size']),\
+		# 	('Used',disk['Used']),('Avail',disk['Avail']),('Use%',disk['Use%']),\
+		# 	('Mounted on',disk['Mounted on'])])
+		ip = host['ip']
+		hostname = host['hostname']
+		metric = OrderedDict(
+			 [('ip',host['ip']),('hostname',host['hostname']),('platform',host['platform']),\
+			 ('cpus',host['cpus']),('mem_total',host['mem']['total']),('swap_total',host['mem']['swap_total']),\
+			 ('disk',host['disk']),('uptime',host['uptime']),('minion_status',host['minion_status'])])
+		host_static_info = json2html.convert(json = metric)
+	return render(request,'opsdb/host/host_static_info.html',locals())	
+
+def show_performance(request,ip,hostname):
+	metrics = MONGO_CLIENT.salt.metrics.find({'ip':ip,'hostname':hostname}).sort([("_id", 1)]).limit(1440)
+	ip = metrics[0]['ip']
+	hostname = metrics[0]['hostname']
+	capturetime = []
+	load = []
+	iowait_cpu = []
+	system_cpu = []
+	user_cpu = []
+	idle_cpu = []
+	steal_cpu = []
+	nice_cpu = []
+	usage_cpu = []
+	mem_percent = []
+	mem_used = []
+	mem_free = []
+	swap_used = []
+	swap_free = []
+	disk_rw = {}
+	traffic = []
+	for metric in metrics:
+		capturetime.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(metric['capturetime'])))
+		load.append(metric['load'])
+		iowait_cpu.append(metric['cpu_usage']['iowait_cpu'])
+		system_cpu.append(metric['cpu_usage']['system_cpu'])
+		user_cpu.append(metric['cpu_usage']['user_cpu'])
+		# idle_cpu.append(metric['cpu_usage']['idle_cpu'])
+		steal_cpu.append(metric['cpu_usage']['steal_cpu'])
+		nice_cpu.append(metric['cpu_usage']['nice_cpu'])
+		usage_cpu.append(metric['cpu_usage']['usage_cpu'])
+		mem_percent.append(metric['mem']['percent'])
+		mem_used.append(metric['mem']['usage'])
+		mem_free.append(metric['mem']['free'])
+		swap_used.append(metric['mem']['swap_used'])
+		swap_free.append(metric['mem']['swap_free'])
+
+	# load line
+	line_load = Line("负载曲线",height=200)
+	line_load.add("负载", capturetime, load, is_smooth=True, mark_point=["average", "max"],\
+		is_datazoom_show=True)
+
+	# cpu line
+	line_cpu = Line("CPU曲线",height=200)
+	line_cpu.add("iowait_cpu", capturetime, iowait_cpu, is_smooth=True)
+	line_cpu.add("system_cpu", capturetime, system_cpu, is_smooth=True)
+	line_cpu.add("user_cpu", capturetime, user_cpu, is_smooth=True)
+	# line_cpu.add("idle_cpu", capturetime, idle_cpu, is_smooth=True)
+	line_cpu.add("steal_cpu", capturetime, steal_cpu, is_smooth=True)
+	line_cpu.add("nice_cpu", capturetime, nice_cpu, is_smooth=True)
+	line_cpu.add("usage_cpu", capturetime, usage_cpu, is_smooth=True,is_datazoom_show=True)
+
+	# memery line
+	line_mem = Line("内存监控",height=200)
+	line_mem.add("memery usage percent",capturetime, mem_percent, is_smooth=True)
+	line_mem.add("Mem_used(MB)",capturetime, mem_used, is_smooth=True)
+	line_mem.add("Mem_idle(MB)",capturetime, mem_free, is_smooth=True)
+	line_mem.add("Swap_used(MB)",capturetime, swap_used, is_smooth=True)
+	line_mem.add("Swap_idle(MB)",capturetime, swap_free, is_smooth=True,is_datazoom_show=True)
+
+	page = Page()
+	page.add(line_load)
+	page.add(line_cpu)
+	page.add(line_mem)
+
+	template = loader.get_template('opsdb/host/show_performance.html')
+	context = dict(
+        myechart=page.render_embed(),
+		host=DEFAULT_HOST,
+		script_list=page.get_js_dependencies(),
+		ip=ip,
+		hostname=hostname
+    )
+	return HttpResponse(template.render(context, request))
+
+def show_user(request,ip,hostname):
+	hosts = MONGO_CLIENT.salt.metrics.find({'ip':ip,'hostname':hostname}).sort([("_id", -1)]).limit(1)
+	for host in hosts:
+		ip = host['ip']
+		hostname = host['hostname']
+		logged_users = host['users']['logged_user']
+		all_users = host['users']['all_users']
+	return render(request,'opsdb/host/show_user.html',locals())
+
+def show_socket(request,ip,hostname):
+	hosts = MONGO_CLIENT.salt.metrics.find({'ip':ip,'hostname':hostname}).sort([("_id", -1)]).limit(1)
+	for host in hosts:
+		ip = host['ip']
+		hostname = host['hostname']
+		sockets = host['sockets']
+	return render(request,'opsdb/host/show_socket.html',locals())
+
+def show_process(request,ip,hostname):
+	hosts = MONGO_CLIENT.salt.metrics.find({'ip':ip,'hostname':hostname}).sort([("_id", -1)]).limit(1)
+	for host in hosts:
+		ip = host['ip']
+		hostname = host['hostname']
+		processes = host['processes']
+	return render(request,'opsdb/host/show_process.html',locals())
+
+
+
+
+
+
+
+
+
+
