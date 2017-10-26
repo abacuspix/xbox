@@ -47,7 +47,7 @@ RQ_QUEUES = {
 SECRET_KEY = '%qijyrvy)-+fmv&twl&vikpw1+z6$9dbut-!!(qcyeb42&zd+*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 

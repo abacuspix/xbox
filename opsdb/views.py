@@ -1237,7 +1237,7 @@ def zabbix(request,ip,minion_id):
 		dt_from = time.mktime(time.strptime(request.POST.get('dt_from',''),'%Y-%m-%d %H:%M:%S'))
 	else:
 		dt_till = time.time()
-		dt_from = dt_till - 60 * 60 * 24
+		dt_from = dt_till - 60 * 60 * 1
 	metrics = ['CPU load','Memery usage','Swap usage','Disk space usage /','Network traffic']
 	metric_selected = request.POST.get('metric','') if request.POST.get('metric','') else 'CPU load'
 	hostid = get_hostid_by_ip(ip)
@@ -1287,7 +1287,7 @@ def zabbix(request,ip,minion_id):
 			date_mem.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
 			mem_a.append(round(float(x['value'])/1024/1024,2))
 		line = Line(width=1000)
-		line.add("memory.size[available](MB)", date_mem, mem_a, \
+		line.add("memory.size[available]", date_mem, mem_a, \
 			# tooltip_tragger='axis',\
 			datazoom_type='both',\
 			is_fill=True, \
@@ -1297,6 +1297,7 @@ def zabbix(request,ip,minion_id):
 			is_datazoom_show=True,\
 			datazoom_range=[0,100],\
 			mark_point=["max","min","average"],\
+			yaxis_formatter=" MB",\
 			mark_point_textcolor='#000')
 	elif metric_selected == 'Swap usage':
 		# Swap usage
@@ -1311,18 +1312,70 @@ def zabbix(request,ip,minion_id):
 			date_swap_t.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
 			swap_t.append(float(x['value'])/1024/1024)
 		line = Line(width=1000)
-		line.add("system.swap.size[,free](MB)",date_swap_f,swap_f,\
+		line.add("system.swap.size[,free]",date_swap_f,swap_f,\
 			# tooltip_tragger='axis',\
 			datazoom_type='both',\
 			is_more_utils=True,\
 			is_datazoom_show=True,\
 			datazoom_range=[0,100],\
 			mark_point=["max","min","average"],\
+			yaxis_formatter=" MB",\
 			mark_point_textcolor='#000')
 		# line.add("system.swap.size[,total](MB)",date_swap_t,swap_t,is_more_utils=True,is_datazoom_show=True,datazoom_range=[96,100],mark_point=["average", "max", "min"])
+	elif metric_selected == 'Network traffic':
+		traffic_out_itemids = get_itemids_by_hostid(hostid,'net.if.out')
+		traffic_in_itemids = get_itemids_by_hostid(hostid,'net.if.in')
+		traffic_out ,traffic_in = {},{}
+		for key,value in traffic_out_itemids.items():
+			traffic_out[key] = get_history_data(value,time_from=dt_from,time_till=dt_till)
+		for key,value in traffic_in_itemids.items():
+			traffic_in[key] = get_history_data(value,time_from=dt_from,time_till=dt_till)
+		line = Line(width=1000)
+		for key,value in traffic_out.items():
+			date,data = [],[]
+			for x in value:
+				date.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+				data.append(round(float(x['value'])/1024,2))
+			line.add(key,date,data,\
+				datazoom_type='both',\
+				is_more_utils=True,\
+				is_datazoom_show=True,\
+				datazoom_range=[0,100],\
+				mark_point=["max","min","average"],\
+				yaxis_formatter=" Kbps",\
+				mark_point_textcolor='#000')
+		for key,value in traffic_in.items():
+			date,data = [],[]
+			for x in value:
+				date.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+				data.append(round(float(x['value'])/1024,2))
+			line.add(key,date,data,\
+				datazoom_type='both',\
+				is_more_utils=True,\
+				is_datazoom_show=True,\
+				datazoom_range=[0,100],\
+				mark_point=["max","min","average"],\
+				yaxis_formatter=" Kbps",\
+				mark_point_textcolor='#000')
+	elif metric_selected == 'Disk space usage /':
+		itemids = get_itemids_by_hostid(hostid,'vfs.fs.size[/,pfree]')
+		free_percent = get_history_data(itemids['vfs.fs.size[/,pfree]'],time_from=dt_from,time_till=dt_till)
+		date,data = [],[]
+		line = Line(width=1000)
+		for x in free_percent:
+			date.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			data.append(round(float(x['value']),2))
+		line.add('Free disk space on / (percentage)',date,data,\
+				datazoom_type='both',\
+				is_more_utils=True,\
+				is_datazoom_show=True,\
+				datazoom_range=[0,100],\
+				mark_point=["max","min","average"],\
+				yaxis_formatter="%",\
+				mark_point_textcolor='#000')
 	else:
 		line = Line(width=1000)
-		line.add("#",[1,2,3,4,5,6,7],[1,2,2,1,3,1,4])
+		line.add("测试",[1,2,3,4,5,6,7],[1,2,2,1,3,1,4])
 	page = Page()
 	page.add(line)
 
@@ -1340,8 +1393,159 @@ def zabbix(request,ip,minion_id):
     )
 	return HttpResponse(template.render(context, request))
 
+@csrf_exempt
+def zabbix_refresh(request,ip,minion_id):
+	if request.POST.get('dt_till',''):
+		dt_till = time.mktime(time.strptime(request.POST.get('dt_till',''),'%Y-%m-%d %H:%M:%S'))
+		dt_from = time.mktime(time.strptime(request.POST.get('dt_from',''),'%Y-%m-%d %H:%M:%S'))
+	else:
+		dt_till = time.time()
+		dt_from = dt_till - 60 * 60 * 1
+	metrics = ['CPU load','Memery usage','Swap usage','Disk space usage /','Network traffic']
+	metric_selected = request.POST.get('metric','') if request.POST.get('metric','') else 'CPU load'
+	hostid = get_hostid_by_ip(ip)
+	if metric_selected == 'CPU load':
+		# CPU
+		cpu_itemids = get_itemids_by_hostid(hostid,'system.cpu.load')
+		cpu_1 = get_history_data(cpu_itemids['system.cpu.load[percpu,avg1]'],time_from=dt_from,time_till=dt_till)
+		cpu_5 = get_history_data(cpu_itemids['system.cpu.load[percpu,avg5]'],time_from=dt_from,time_till=dt_till)
+		cpu_15 = get_history_data(cpu_itemids['system.cpu.load[percpu,avg15]'],time_from=dt_from,time_till=dt_till)
+		date_cpu,cpu_data1,cpu_data5,cpu_data15 = [],[],[],[]
+		for x,y,z in zip(cpu_1,cpu_5,cpu_15):
+			date_cpu.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			cpu_data1.append(x['value'])
+			cpu_data5.append(y['value'])
+			cpu_data15.append(z['value'])
+		line = Line(width=1000)
+		line.add("cpu.load[percpu,avg1]", date_cpu, cpu_data1, \
+			# tooltip_tragger='axis',\
+			datazoom_type='both',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+		line.add("cpu.load[percpu,avg5]", date_cpu, cpu_data5, \
+			datazoom_type='both',\
+			# tooltip_tragger='axis',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+		line.add("cpu.load[percpu,avg15]", date_cpu, cpu_data15, \
+			datazoom_type='both',\
+			# tooltip_tragger='axis',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+	elif metric_selected == 'Memery usage':
+		# Memery
+		mem_itemids = get_itemids_by_hostid(hostid,'vm.memory.size[available]')
+		mem_available = get_history_data(mem_itemids['vm.memory.size[available]'],time_from=dt_from,time_till=dt_till)
+		date_mem,mem_a = [],[]
+		for x in mem_available:
+			date_mem.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			mem_a.append(round(float(x['value'])/1024/1024,2))
+		line = Line(width=1000)
+		line.add("memory.size[available]", date_mem, mem_a, \
+			# tooltip_tragger='axis',\
+			datazoom_type='both',\
+			is_fill=True, \
+			area_color='#00FF00', \
+			area_opacity=0.3,\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			yaxis_formatter=" MB",\
+			mark_point_textcolor='#000')
+	elif metric_selected == 'Swap usage':
+		# Swap usage
+		swap_itemids = get_itemids_by_hostid(hostid,'system.swap.size')
+		swap_free = get_history_data(swap_itemids['system.swap.size[,free]'],time_from=dt_from,time_till=dt_till)
+		swap_total = get_history_data(swap_itemids['system.swap.size[,total]'],time_from=dt_from,time_till=dt_till)
+		date_swap_f,date_swap_t,swap_f,swap_t = [],[],[],[]
+		for x in swap_free:
+			date_swap_f.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			swap_f.append(round(float(x['value'])/1024/1024,2))
+		for x in swap_total:
+			date_swap_t.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			swap_t.append(float(x['value'])/1024/1024)
+		line = Line(width=1000)
+		line.add("system.swap.size[,free]",date_swap_f,swap_f,\
+			# tooltip_tragger='axis',\
+			datazoom_type='both',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			yaxis_formatter=" MB",\
+			mark_point_textcolor='#000')
+		# line.add("system.swap.size[,total](MB)",date_swap_t,swap_t,is_more_utils=True,is_datazoom_show=True,datazoom_range=[96,100],mark_point=["average", "max", "min"])
+	elif metric_selected == 'Network traffic':
+		traffic_out_itemids = get_itemids_by_hostid(hostid,'net.if.out')
+		traffic_in_itemids = get_itemids_by_hostid(hostid,'net.if.in')
+		traffic_out ,traffic_in = {},{}
+		for key,value in traffic_out_itemids.items():
+			traffic_out[key] = get_history_data(value,time_from=dt_from,time_till=dt_till)
+		for key,value in traffic_in_itemids.items():
+			traffic_in[key] = get_history_data(value,time_from=dt_from,time_till=dt_till)
+		line = Line(width=1000)
+		for key,value in traffic_out.items():
+			date,data = [],[]
+			for x in value:
+				date.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+				data.append(round(float(x['value'])/1024,2))
+			line.add(key,date,data,\
+				datazoom_type='both',\
+				is_more_utils=True,\
+				is_datazoom_show=True,\
+				datazoom_range=[0,100],\
+				mark_point=["max","min","average"],\
+				yaxis_formatter=" Kbps",\
+				mark_point_textcolor='#000')
+		for key,value in traffic_in.items():
+			date,data = [],[]
+			for x in value:
+				date.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+				data.append(round(float(x['value'])/1024,2))
+			line.add(key,date,data,\
+				datazoom_type='both',\
+				is_more_utils=True,\
+				is_datazoom_show=True,\
+				datazoom_range=[0,100],\
+				mark_point=["max","min","average"],\
+				yaxis_formatter=" Kbps",\
+				mark_point_textcolor='#000')
+	elif metric_selected == 'Disk space usage /':
+		itemids = get_itemids_by_hostid(hostid,'vfs.fs.size[/,pfree]')
+		free_percent = get_history_data(itemids['vfs.fs.size[/,pfree]'],time_from=dt_from,time_till=dt_till)
+		date,data = [],[]
+		line = Line(width=1000)
+		for x in free_percent:
+			date.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			data.append(round(float(x['value']),2))
+		line.add('Free disk space on / (percentage)',date,data,\
+				datazoom_type='both',\
+				is_more_utils=True,\
+				is_datazoom_show=True,\
+				datazoom_range=[0,100],\
+				mark_point=["max","min","average"],\
+				yaxis_formatter="%",\
+				mark_point_textcolor='#000')
+	else:
+		line = Line(width=1000)
+		line.add("测试",[1,2,3,4,5,6,7],[1,2,2,1,3,1,4])
+	page = Page()
+	page.add(line)
 
-
+	context = dict(myechart=page.render_embed(),\
+		dt_from=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(dt_from)),\
+		dt_till=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(dt_till)))
+	return HttpResponse(json.dumps(context))
 
 
 

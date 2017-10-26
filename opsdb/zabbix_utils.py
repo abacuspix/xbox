@@ -33,7 +33,7 @@ def get_itemids_by_hostid(hostid,key):
 	return ret
 
 # time.mktime(datetime.datetime.now().timetuple())
-def get_history_data(itemids=[],time_from=time.time() - 60 * 60 * 24,time_till=time.time()):
+def get_history_data(itemids=[],time_from=time.time() - 60 * 60 * 1,time_till=time.time()):
 	try:
 		# Query item's history (integer) data
 		history = zapi.history.get(itemids=itemids,

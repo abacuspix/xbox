@@ -63,13 +63,13 @@
                     		<form method="post" action="{% url 'opsdb:zabbix' ip id %}" id='zabbix'>
                     			{% csrf_token %}
                     			<label>时间范围:</label>
-								<input type="text" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_from}}" name="dt_from" required>
+								<input type="text" id="dt_from" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_from}}" name="dt_from" required>
 								--
-	                    	    <input type="text" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_till}}" name="dt_till" required>
+	                    	    <input type="text" id="dt_till" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_till}}" name="dt_till" required>
 	                    	    <button onclick="submit()">确定</button>
 	                    		&nbsp&nbsp
 	                    		<label>指标类型:</label>
-	                    		<select onchange="submit()" name="metric">
+	                    		<select onchange="refresh()" name="metric" id="metric">
 	                    			{% for metric in metrics %}
 	                    				{% if metric == metric_selected %}
 	                                	<option value="{{ metric }}" selected>{{ metric }}</option>
@@ -81,7 +81,7 @@
                     		</form>
                     	</div>
                     	<br>
-                        <div class="col-lg-12 col-sm-12">{{myechart|safe}}</div>
+                        <div class="col-lg-12 col-sm-12" id='myechart'>{{myechart|safe}}</div>
                     </div>
                 </div>
         </section>
@@ -103,8 +103,23 @@
     <script type="text/javascript">
     	function submit()
 			{
-			    document.getElementById("zabbix").submit();    
+			    document.getElementById("zabbix").submit();
+                // $.post("{% url 'opsdb:zabbix' ip id %}",{"metric":"{{metric_selected}}"}
 			}
+
+
+        window.setInterval(refresh, 60000); 
+        function refresh() 
+            { 
+                 metric=$("#metric").val(); 
+                 $.post("{% url 'opsdb:zabbix_refresh' ip id %}",{"metric":metric},function(result){
+                        obj=JSON.parse(result);
+                        $("#dt_till").val(obj['dt_till']);
+                        $("#dt_from").val(obj['dt_from']);
+                        $("#myechart").html(obj['myechart']);
+                  });
+                
+            } 
     </script>
 
   </body>
