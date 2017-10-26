@@ -47,7 +47,7 @@ RQ_QUEUES = {
 SECRET_KEY = '%qijyrvy)-+fmv&twl&vikpw1+z6$9dbut-!!(qcyeb42&zd+*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -177,6 +177,10 @@ MONGO_CLIENT = MongoClient(MONGO_IP,int(MONGO_PORT))
 from redis import Redis
 from rq_scheduler import Scheduler
 scheduler = Scheduler(connection=Redis())
+
+ZABBIX_SERVER = 'http://192.168.3.171/zabbix'
+ZABBIX_USER = 'Admin'
+ZABBIX_PASS = 'zabbix'
 
 LOGGING = {
     'version': 1,

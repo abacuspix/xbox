@@ -19,7 +19,7 @@ from opsdb.saltapi import SaltAPI
 from xbox.sshapi import remote_cmd
 from json2html import *
 from django.db.models import Q
-import time
+import time,datetime
 from .utils import exacute_cmd,upload_file,push_file_to_minion,get_file_from_minion,run_script,state_deploy
 import os
 import collections
@@ -27,6 +27,7 @@ import json
 from collections import OrderedDict
 from pyecharts import Line,Grid,Page
 from pyecharts.constants import DEFAULT_HOST
+from .zabbix_utils import get_hostid_by_ip,get_itemids_by_hostid,get_history_data
 # Create your views here.
 
 @login_required
@@ -128,7 +129,7 @@ def add_host(request):
 		zabbix = request.POST.get('zabbix','')
 		hostgroups = request.POST.getlist('hostgroups','')
 		env = request.POST.get('env','')
-		cmd = "curl -s http://%s:%s/install_agent.sh | sh 2>&1"%(FTP_IP,FTP_PORT)
+		cmd = "curl -s http://%s:%s/install-minion.sh | sh 2>&1"%(FTP_IP,FTP_PORT)
 		ret = remote_cmd(cmd,ip,port=int(port),user=user,passwd=passwd)
 		if ret['status'] and not ret['err']:
 			host,created = Host.objects.get_or_create(ip=ip)
@@ -190,56 +191,84 @@ def hosts(request):
 	return render(request,'opsdb/host/hosts.html',locals())
 
 def host(request,id):
+	minion_id = id
 	hosts = MONGO_CLIENT.salt.salt_grains.find({'id':id}).sort([("_id", -1)]).limit(1)
-	grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
+	# grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
 	if hosts:
 		for host in hosts:
 			ret = host.get('return',None)
 			os_family = ret.get('os_family',None)
 			if os_family == 'Windows':
-				pass
+				summary = json2html.convert(json = ret)
 			else:
 				os_family = "Linux"
 				# operation system info
-				grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
-				grains['os']['fqdn'] = ret.get('fqdn',None)
-				grains['os']['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
-				grains['os']['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
-				grains['os']['disk-usage'] = ret.get('disk-usage',None)
-				grains['os']['selinux'] = ret.get('selinux',None)
-				grains['os']['fqdn_ip4'] = ret.get('fqdn_ip4',None)
-				grains['os']['ip4_interfaces'] = ret.get('ip4_interfaces',None)
-				grains['os']['ip6_interfaces'] = ret.get('ip6_interfaces',None)
-				grains['os']['routes'] = ret.get('routes',None)
-				grains['os']['dns'] = ret.get('dns',None)
-				grains['os']['ntp'] = ret.get('ntp',None)
-				grains['os']['iptable'] = ret.get('iptable',None)
-				grains['os']['systemd'] = ret.get('systemd',None)
-				grains['os']['lsb_distrib'] = {'id':ret['lsb_distrib_id'],'codename':ret['lsb_distrib_codename']}
-				os = json2html.convert(json = grains['os'])
+				# grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
+				# grains['os']['fqdn'] = ret.get('fqdn',None)
+				# grains['os']['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
+				# grains['os']['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
+				# grains['os']['disk-usage'] = ret.get('disk-usage',None)
+				# grains['os']['selinux'] = ret.get('selinux',None)
+				# grains['os']['fqdn_ip4'] = ret.get('fqdn_ip4',None)
+				# grains['os']['ip4_interfaces'] = ret.get('ip4_interfaces',None)
+				# grains['os']['ip6_interfaces'] = ret.get('ip6_interfaces',None)
+				# grains['os']['routes'] = ret.get('routes',None)
+				# grains['os']['dns'] = ret.get('dns',None)
+				# grains['os']['ntp'] = ret.get('ntp',None)
+				# grains['os']['iptable'] = ret.get('iptable',None)
+				# grains['os']['systemd'] = ret.get('systemd',None)
+				# grains['os']['lsb_distrib'] = {'id':ret['lsb_distrib_id'],'codename':ret['lsb_distrib_codename']}
+				# os = json2html.convert(json = grains['os'])
 
 				# software info
-				grains['software'] = ret.get('software',None)
-				users = json2html.convert(json = grains['software'])
+				# grains['software'] = ret.get('software',None)
+				# users = json2html.convert(json = grains['software'])
 
 				# system user info
-				grains['users'] = ret.get('users',None)
-				users = json2html.convert(json = grains['users'])
+				# grains['users'] = ret.get('users',None)
+				# users = json2html.convert(json = grains['users'])
 
 				# hardware info
-				grains['hardware']['virtual'] = ret.get('virtual',None)
-				grains['hardware']['serialnumber'] = ret.get('serialnumber',None)
-				grains['hardware']['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
-				grains['hardware']['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
-				grains['hardware']['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
-				grains['hardware']['HBA'] = ret.get('HBA',None)
-				hardware = json2html.convert(json = grains['hardware'])
+				# grains['hardware']['virtual'] = ret.get('virtual',None)
+				# grains['hardware']['serialnumber'] = ret.get('serialnumber',None)
+				# grains['hardware']['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
+				# grains['hardware']['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
+				# grains['hardware']['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
+				# grains['hardware']['HBA'] = ret.get('HBA',None)
+				# hardware = json2html.convert(json = grains['hardware'])
 
 				# user cron info
-				cron = json2html.convert(json = grains['cron'])
+				# cron = json2html.convert(json = grains['cron'])
 
-			# summary info
-			summary = json2html.convert(json = ret)
+				# grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
+				factor = {}
+				factor['hostname'] = ret.get('nodename',None)
+				factor['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
+				factor['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])
+				factor['disk-usage'] = ret.get('disk-usage',None)
+				factor['selinux'] = ret.get('selinux',None)
+				factor['ip'] = ret.get('ipv4',None)
+				factor['ip4_interfaces'] = ret.get('ip4_interfaces',None)
+				factor['ip6_interfaces'] = ret.get('ip6_interfaces',None)
+				factor['routes'] = ret.get('routes',None)
+				factor['dns'] = ret.get('dns',None)
+				factor['ntp'] = ret.get('ntp',None)
+				factor['iptable'] = ret.get('iptable',None)
+				factor['virtual'] = ret.get('virtual',None)
+				factor['serialnumber'] = ret.get('serialnumber',None)
+				factor['cpu'] = ' * '.join([str(ret.get('num_cpus')),ret.get('cpu_model')])
+				factor['mem_total(G)'] = ("%.2f"%(ret.get('mem_total',0)/1024.0))
+				factor['Hugepage & Swap'] = ret.get('Hugepage & Swap',None)
+
+				order_summary = OrderedDict(
+			 [('ip',factor['ip']),('hostname',factor['hostname']),('virtual',factor['virtual']),\
+			 ('os',factor['os']),('kernel',factor['kernel']),('cpu',factor['cpu']),\
+			 ('mem_total(G)',factor['mem_total(G)']),\
+			 ('Hugepage & Swap',factor['Hugepage & Swap']),('disk-usage',factor['disk-usage']),\
+			 ('selinux',factor['selinux']),('ip4_interfaces',factor['ip4_interfaces']),\
+			 ('ip6_interfaces',factor['ip6_interfaces']),('routes',factor['routes']),\
+			 ('dns',factor['dns']),('ntp',factor['ntp']),('iptable',factor['iptable'])])
+				summary = json2html.convert(json = order_summary)
 	return render(request,'opsdb/host/host.html',locals())
 
 @login_required
@@ -1202,7 +1231,114 @@ def show_process(request,ip,hostname):
 		processes = host['processes']
 	return render(request,'opsdb/host/show_process.html',locals())
 
+def zabbix(request,ip,minion_id):
+	if request.POST.get('dt_till',''):
+		dt_till = time.mktime(time.strptime(request.POST.get('dt_till',''),'%Y-%m-%d %H:%M:%S'))
+		dt_from = time.mktime(time.strptime(request.POST.get('dt_from',''),'%Y-%m-%d %H:%M:%S'))
+	else:
+		dt_till = time.time()
+		dt_from = dt_till - 60 * 60 * 24
+	metrics = ['CPU load','Memery usage','Swap usage','Disk space usage /','Network traffic']
+	metric_selected = request.POST.get('metric','') if request.POST.get('metric','') else 'CPU load'
+	hostid = get_hostid_by_ip(ip)
+	if metric_selected == 'CPU load':
+		# CPU
+		cpu_itemids = get_itemids_by_hostid(hostid,'system.cpu.load')
+		cpu_1 = get_history_data(cpu_itemids['system.cpu.load[percpu,avg1]'],time_from=dt_from,time_till=dt_till)
+		cpu_5 = get_history_data(cpu_itemids['system.cpu.load[percpu,avg5]'],time_from=dt_from,time_till=dt_till)
+		cpu_15 = get_history_data(cpu_itemids['system.cpu.load[percpu,avg15]'],time_from=dt_from,time_till=dt_till)
+		date_cpu,cpu_data1,cpu_data5,cpu_data15 = [],[],[],[]
+		for x,y,z in zip(cpu_1,cpu_5,cpu_15):
+			date_cpu.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			cpu_data1.append(x['value'])
+			cpu_data5.append(y['value'])
+			cpu_data15.append(z['value'])
+		line = Line(width=1000)
+		line.add("cpu.load[percpu,avg1]", date_cpu, cpu_data1, \
+			# tooltip_tragger='axis',\
+			datazoom_type='both',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+		line.add("cpu.load[percpu,avg5]", date_cpu, cpu_data5, \
+			datazoom_type='both',\
+			# tooltip_tragger='axis',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+		line.add("cpu.load[percpu,avg15]", date_cpu, cpu_data15, \
+			datazoom_type='both',\
+			# tooltip_tragger='axis',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+	elif metric_selected == 'Memery usage':
+		# Memery
+		mem_itemids = get_itemids_by_hostid(hostid,'vm.memory.size[available]')
+		mem_available = get_history_data(mem_itemids['vm.memory.size[available]'],time_from=dt_from,time_till=dt_till)
+		date_mem,mem_a = [],[]
+		for x in mem_available:
+			date_mem.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			mem_a.append(round(float(x['value'])/1024/1024,2))
+		line = Line(width=1000)
+		line.add("memory.size[available](MB)", date_mem, mem_a, \
+			# tooltip_tragger='axis',\
+			datazoom_type='both',\
+			is_fill=True, \
+			area_color='#00FF00', \
+			area_opacity=0.3,\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+	elif metric_selected == 'Swap usage':
+		# Swap usage
+		swap_itemids = get_itemids_by_hostid(hostid,'system.swap.size')
+		swap_free = get_history_data(swap_itemids['system.swap.size[,free]'],time_from=dt_from,time_till=dt_till)
+		swap_total = get_history_data(swap_itemids['system.swap.size[,total]'],time_from=dt_from,time_till=dt_till)
+		date_swap_f,date_swap_t,swap_f,swap_t = [],[],[],[]
+		for x in swap_free:
+			date_swap_f.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			swap_f.append(round(float(x['value'])/1024/1024,2))
+		for x in swap_total:
+			date_swap_t.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(x['clock']))))
+			swap_t.append(float(x['value'])/1024/1024)
+		line = Line(width=1000)
+		line.add("system.swap.size[,free](MB)",date_swap_f,swap_f,\
+			# tooltip_tragger='axis',\
+			datazoom_type='both',\
+			is_more_utils=True,\
+			is_datazoom_show=True,\
+			datazoom_range=[0,100],\
+			mark_point=["max","min","average"],\
+			mark_point_textcolor='#000')
+		# line.add("system.swap.size[,total](MB)",date_swap_t,swap_t,is_more_utils=True,is_datazoom_show=True,datazoom_range=[96,100],mark_point=["average", "max", "min"])
+	else:
+		line = Line(width=1000)
+		line.add("#",[1,2,3,4,5,6,7],[1,2,2,1,3,1,4])
+	page = Page()
+	page.add(line)
 
+	template = loader.get_template('opsdb/host/zabbix.html')
+	context = dict(
+        myechart=page.render_embed(),
+		host=DEFAULT_HOST,
+		script_list=page.get_js_dependencies(),
+		ip=ip,
+		id=minion_id,
+		metrics=metrics,
+		metric_selected=metric_selected,
+		dt_from=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(dt_from)),
+		dt_till=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(dt_till))
+    )
+	return HttpResponse(template.render(context, request))
 
 
 

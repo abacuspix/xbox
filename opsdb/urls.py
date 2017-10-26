@@ -77,4 +77,8 @@ urlpatterns = [
     url(r'^metrics/show_user/(.+)/(.+)/$',views.show_user,name='show_user'),
     url(r'^metrics/show_socket/(.+)/(.+)/$',views.show_socket,name='show_socket'),
     url(r'^metrics/show_process/(.+)/(.+)/$',views.show_process,name='show_process'),
+    url(r'^zabbix/(.+)/(.+)/$',views.zabbix,name='zabbix'),
 ]
+
+
+

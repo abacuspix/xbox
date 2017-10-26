@@ -153,7 +153,7 @@
                                 {% for host in hosts %}
                                   <tr>
                                     <td><input type="checkbox"></td>
-                                    <td id="{{host.id}}"><small><a href="{% url 'opsdb:show_host' host.ip host.hostname %}">{{host.hostname}}</a></small></td>
+                                    <td id="{{host.id}}"><small><a href="{% url 'opsdb:host' host.minion_id %}">{{host.hostname}}</a></small></td>
                                     <td><small>{{host.ip}}</small></td>
                                     <td><small data-placement="left" data-toggle="tooltip" class="tooltips" data-original-title="{{host.os}}">{{host.os | truncatewords:2 }}</small></td>
                                     <td>

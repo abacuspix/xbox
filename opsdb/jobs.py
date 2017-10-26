@@ -23,7 +23,7 @@ def check_minion_status(arg,arg1,target,arg_list):
 	try:
 		salt = SaltAPI(SALT_IP,SALT_USER,SALT_PASSWD,port=SALT_PORT)
 		ret = salt.minion_alive_check()
-		# Host.objects.filter(minion_status=False).update(minion_status=True)
+		Host.objects.filter(minion_status='E').update(minion_status='O')
 		if ret:
 			for minion in ret:
 				try:

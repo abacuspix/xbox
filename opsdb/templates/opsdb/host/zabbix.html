@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Mosaddek">
+    <!-- <meta http-equiv="refresh" content="20"> -->
     <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
     <link rel="shortcut icon" href="{%static 'img/favicon.ico'%}">
 
@@ -17,6 +18,10 @@
     <!-- Custom styles for this template -->
     <link href="{%static 'css/style.css'%}" rel="stylesheet">
     <link href="{%static 'css/style-responsive.css'%}" rel="stylesheet" />
+    {% for jsfile_name in script_list %}
+    <script src="{{host}}/{{jsfile_name}}.js"></script>
+    {% endfor %}
+    <script src="{%static 'js/date.js'%}"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
     <!--[if lt IE 9]>
@@ -44,19 +49,39 @@
         <section class="panel">
                 <header class="panel-heading tab-bg-dark-navy-blue ">
                     <ul class="nav nav-tabs">
-                        <li class="active">
-                            <a href="{% url 'opsdb:host' minion_id %}" style="left: 15px;">概览</a>
-                        </li>
-                        {% if os_family == 'Linux'%}
                         <li class="">
-                            <a href="{% url 'opsdb:zabbix' factor.ip.0 minion_id %}" style="left: 15px;">监控</a>
+                            <a href="{% url 'opsdb:host' id %}" style="left: 15px;">概览</a>
                         </li>
-                        {% endif %}
+                        <li class="active">
+                            <a href="{% url 'opsdb:zabbix' ip id %}" style="left: 15px;">监控</a>
+                        </li>
                     </ul>
                 </header>
                 <div class="panel-body">
                     <div class="tab-content">
-                        <div id="summary" class="tab-pane active">{% autoescape off %}{{summary}}{% endautoescape %}</div>
+                    	<div align="center">
+                    		<form method="post" action="{% url 'opsdb:zabbix' ip id %}" id='zabbix'>
+                    			{% csrf_token %}
+                    			<label>时间范围:</label>
+								<input type="text" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_from}}" name="dt_from" required>
+								--
+	                    	    <input type="text" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_till}}" name="dt_till" required>
+	                    	    <button onclick="submit()">确定</button>
+	                    		&nbsp&nbsp
+	                    		<label>指标类型:</label>
+	                    		<select onchange="submit()" name="metric">
+	                    			{% for metric in metrics %}
+	                    				{% if metric == metric_selected %}
+	                                	<option value="{{ metric }}" selected>{{ metric }}</option>
+	                                	{% else %}
+	                                	<option value="{{ metric }}">{{ metric }}</option>
+	                    				{% endif %}
+	                    			{% endfor %}}
+	                            </select>
+                    		</form>
+                    	</div>
+                    	<br>
+                        <div class="col-lg-12 col-sm-12">{{myechart|safe}}</div>
                     </div>
                 </div>
         </section>
@@ -70,9 +95,17 @@
     <script src="{%static 'js/jquery.scrollTo.min.js'%}"></script>
     <script src="{%static 'js/jquery.nicescroll.js'%}" type="text/javascript"></script>
     <script src="{%static 'js/respond.min.js'%}" ></script>
+    
 
     <!--common script for all pages-->
     <script src="{%static 'js/common-scripts.js'%}"></script>
     <script src="{%static 'layer/layer.js'%}"></script>
+    <script type="text/javascript">
+    	function submit()
+			{
+			    document.getElementById("zabbix").submit();    
+			}
+    </script>
+
   </body>
 </html>
