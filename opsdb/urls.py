@@ -78,7 +78,7 @@ urlpatterns = [
     url(r'^metrics/show_socket/(.+)/(.+)/$',views.show_socket,name='show_socket'),
     url(r'^metrics/show_process/(.+)/(.+)/$',views.show_process,name='show_process'),
     url(r'^zabbix/(.+)/(.+)/$',views.zabbix,name='zabbix'),
-    url(r'^zabbix_refresh/(.+)/(.+)/$',views.zabbix_refresh,name='zabbix_refresh'),
+    url(r'^zabbix_refresh/$',views.zabbix_refresh,name='zabbix_refresh'),
 ]
 
 

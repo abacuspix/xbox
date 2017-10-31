@@ -21,9 +21,9 @@ def get_hostid_by_ip(ip):
 	return data
 
 def get_itemids_by_hostid(hostid,key):
+	ret = {}
 	try:
 		data = zapi.item.get(output=['itemid','key_'],hostids=hostid,search={"key_": key})
-		ret = {}
 		if data:
 			for ele in data:
 				ret[ele['key_']] = ele['itemid']
@@ -32,7 +32,35 @@ def get_itemids_by_hostid(hostid,key):
 
 	return ret
 
-# time.mktime(datetime.datetime.now().timetuple())
+
+def get_graph_by_ip(ip):
+	ret = {}
+	try:
+		hostid = get_hostid_by_ip(ip)
+		graphids = zapi.graph.get(output=["graphid",'name'],hostids=hostid)
+		if graphids:
+			for ele in graphids:
+				ret[ele['name']] = ele['graphid']
+	except Exception as e:
+		ret = str(e)
+	return ret
+
+def get_item_by_graphid(graphid):
+	ret = {}
+	try:
+		itemids = zapi.graphitem.get(output=['itemid'],graphids=graphid)
+		if itemids:
+			ids = []
+			for ele in itemids:
+				ids.append(ele['itemid'])
+			items = zapi.item.get(output=['key_'],itemids=ids)
+			if items:
+				for ele in items:
+					ret[ele['key_']] = ele['itemid']
+	except Exception as e:
+		ret = str(e)
+	return ret
+
 def get_history_data(itemids=[],time_from=time.time() - 60 * 60 * 1,time_till=time.time()):
 	try:
 		# Query item's history (integer) data
@@ -58,7 +86,3 @@ def get_history_data(itemids=[],time_from=time.time() - 60 * 60 * 1,time_till=ti
 		history = str(e)
 	
 	return history
-
-
-
-

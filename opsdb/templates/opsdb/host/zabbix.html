@@ -18,10 +18,9 @@
     <!-- Custom styles for this template -->
     <link href="{%static 'css/style.css'%}" rel="stylesheet">
     <link href="{%static 'css/style-responsive.css'%}" rel="stylesheet" />
-    {% for jsfile_name in script_list %}
-    <script src="{{host}}/{{jsfile_name}}.js"></script>
-    {% endfor %}
     <script src="{%static 'js/date.js'%}"></script>
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/echarts.js'%}"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
     <!--[if lt IE 9]>
@@ -59,29 +58,178 @@
                 </header>
                 <div class="panel-body">
                     <div class="tab-content">
-                    	<div align="center">
-                    		<form method="post" action="{% url 'opsdb:zabbix' ip id %}" id='zabbix'>
-                    			{% csrf_token %}
-                    			<label>时间范围:</label>
-								<input type="text" id="dt_from" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_from}}" name="dt_from" required>
-								--
-	                    	    <input type="text" id="dt_till" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_till}}" name="dt_till" required>
-	                    	    <button onclick="submit()">确定</button>
-	                    		&nbsp&nbsp
-	                    		<label>指标类型:</label>
-	                    		<select onchange="refresh()" name="metric" id="metric">
-	                    			{% for metric in metrics %}
-	                    				{% if metric == metric_selected %}
-	                                	<option value="{{ metric }}" selected>{{ metric }}</option>
-	                                	{% else %}
-	                                	<option value="{{ metric }}">{{ metric }}</option>
-	                    				{% endif %}
-	                    			{% endfor %}}
-	                            </select>
-                    		</form>
-                    	</div>
-                    	<br>
-                        <div class="col-lg-12 col-sm-12" id='myechart'>{{myechart|safe}}</div>
+                        <div class="col-xs-12 col-md-12 col-sm-12">
+                            <form method="post" action="{% url 'opsdb:zabbix' ip id %}" id='zabbix'>
+                                {% csrf_token %}
+                                <div class="col-xs-8 col-md-6 col-sm-8">
+                                    <label>时间范围:</label>
+                                    <input type="text" id="dt_from" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_from}}" name="dt_from" required>
+                                    --
+                                    <input type="text" id="dt_till" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_till}}" name="dt_till" required>
+                                    <button onclick="submit()">确定</button>
+                                    
+                                </div>
+
+                                <div class="col-xs-4 col-md-6 col-sm-4">
+                                    <label>指标类型:</label>
+                                    <select onchange="submit()" name="graph" id="graphs">
+                                        {% for name,graphid in graphs.items %}
+                                            {% if name == graph_selected %}
+                                            <option value="{{ name }}" selected>{{ name }}</option>
+                                            {% else %}
+                                            <option value="{{ name }}">{{ name }}</option>
+                                            {% endif %}
+                                        {% endfor %}}
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <br><br>
+                        <div id="main" style="width: 1000px;height:380px;"></div>
+                        <div hidden="hidden" id='data'>{{context}}</div>
+                        <script type="text/javascript">
+
+                           
+
+                            // 基于准备好的dom，初始化echarts实例
+                            var myChart = echarts.init(document.getElementById('main'));
+
+                            myChart.showLoading();
+
+                            // 获取初始数据
+                            var context = JSON.parse($("#data").html());
+                            var data = series(context.data);
+
+                            myChart.hideLoading();
+
+                            function series(data) {
+                                var arr = [];
+                                for (x in data)
+                                {
+                                  arr.push({name:data[x].name,type:'line',data:data[x].value});  
+                                }
+                                
+                                
+                                return arr;
+                            }
+
+                            // 指定图表的配置项和数据
+                            var option = {
+                                    // title: {
+                                    //     text: '动态数据 + 时间坐标轴'
+                                    // },
+                                    tooltip: {
+                                        trigger: 'axis',
+                                        // formatter: function (params) {
+                                        //     params = params[0];
+                                        //     var date = new Date(params.name);
+                                        //     return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
+                                        // },
+                                        axisPointer: {
+                                            animation: false
+                                        }
+                                    },
+                                    dataZoom: [
+                                        {
+                                            type: 'slider',
+                                            show: true,
+                                            xAxisIndex: [0],
+                                            start: 75,
+                                            end: 100
+                                        },
+                                        {
+                                            type: 'inside',
+                                            xAxisIndex: [0],
+                                            start: 75,
+                                            end: 100
+                                        }
+                                    ],
+                                    toolbox: {
+                                        show: true,
+                                        orient: 'vertical',
+                                        top: '33%',
+                                        right: "4%",
+                                        feature: {
+                                            dataZoom: {
+                                                yAxisIndex: 'none'
+                                            },
+                                            dataView: {readOnly: false},
+                                            // magicType: {type: ['line', 'bar']},
+                                            restore: {},
+                                            saveAsImage: {}
+                                        }
+                                    },
+                                    legend: {
+                                        data: context.legend
+                                    },
+                                    xAxis: {
+                                        type: 'time',
+                                        splitLine: {
+                                            show: true
+                                        }
+                                    },
+                                    yAxis: {
+                                        type: 'value',
+                                        boundaryGap: [0, '100%'],
+                                        splitLine: {
+                                            show: true
+                                        }
+                                    },
+                                    series: data
+                                };
+
+                           
+
+                            // 使用刚指定的配置项和数据显示图表。
+                            myChart.setOption(option);
+
+
+                            function startTime(){
+                                var today=new Date();
+                                var year =today.getFullYear();
+                                var month= today.getMonth()+1;
+                                var date=today.getDate();
+                                var h=today.getHours();
+                                var m=today.getMinutes();
+                                var s=today.getSeconds();// 在小于10的数字前加一个‘0’
+                                m=checkTime(m);
+                                s=checkTime(s);
+                                return year+"-"+month+"-"+date+" "+h+":"+m+":"+s;
+                            }
+                            function checkTime(i){
+                                if (i<10){
+                                    i="0" + i;
+                                }
+                                return i;
+                            }
+
+
+
+                            // 定时刷新
+                            setInterval(function () {
+
+                                $.post("{% url 'opsdb:zabbix_refresh' %}",{"interval":60,"graph":"{{graph_selected}}","ip":"{{ip}}"},function (result) {
+                                        obj = JSON.parse(result);
+
+                                        for (x in data)
+                                        {
+                                            if (data[x].data.slice(-1)[0][0]!=obj.data[x][0]){
+                                                data[x].data.shift();
+                                                // data[x].data.push([startTime(), Math.random()]);
+                                                data[x].data.push(obj.data[x]);  
+                                            }
+                                            
+                                        }
+
+                                        myChart.setOption({
+                                            series: data
+                                        });
+                                        })
+                               
+                            }, 2000);
+                        </script>
+                        
                     </div>
                 </div>
         </section>
@@ -101,26 +249,11 @@
     <script src="{%static 'js/common-scripts.js'%}"></script>
     <script src="{%static 'layer/layer.js'%}"></script>
     <script type="text/javascript">
-    	function submit()
-			{
-			    document.getElementById("zabbix").submit();
-                // $.post("{% url 'opsdb:zabbix' ip id %}",{"metric":"{{metric_selected}}"}
-			}
-
-
-        window.setInterval(refresh, 60000); 
-        function refresh() 
-            { 
-                 metric=$("#metric").val(); 
-                 $.post("{% url 'opsdb:zabbix_refresh' ip id %}",{"metric":metric},function(result){
-                        obj=JSON.parse(result);
-                        $("#dt_till").val(obj['dt_till']);
-                        $("#dt_from").val(obj['dt_from']);
-                        $("#myechart").html(obj['myechart']);
-                  });
-                
-            } 
+        function submit()
+            {
+                // document.getElementById("zabbix").submit();
+                $.post("{% url 'opsdb:zabbix' ip id %}",{"graph":"{{graph_selected}}"});
+            }
     </script>
-
   </body>
 </html>
