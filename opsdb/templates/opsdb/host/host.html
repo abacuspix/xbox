@@ -35,7 +35,7 @@
               <ul class="breadcrumb">
                   <li><a href="#"></i>运维数据库</a></li>
                   <li><a href="{% url 'opsdb:hosts' %}"></i>主机</a></li>
-                  <li class="active">主机信息</li>
+                  <li class="active">{{minion_id}}</li>
               </ul>
               <!--breadcrumbs end -->
           </div>
@@ -47,11 +47,12 @@
                         <li class="active">
                             <a href="{% url 'opsdb:host' minion_id %}" style="left: 15px;">概览</a>
                         </li>
-                        {% if os_family == 'Linux'%}
                         <li class="">
                             <a href="{% url 'opsdb:zabbix' factor.ip.0 minion_id %}" style="left: 15px;">监控</a>
                         </li>
-                        {% endif %}
+                        <li class="">
+                            <a href="" style="left: 15px;">告警</a>
+                        </li>
                     </ul>
                 </header>
                 <div class="panel-body">

@@ -199,8 +199,10 @@ def host(request,id):
 		for host in hosts:
 			ret = host.get('return',None)
 			os_family = ret.get('os_family',None)
+			factor = {}
 			if os_family == 'Windows':
 				summary = json2html.convert(json = ret)
+				factor['ip'] = ret.get('ipv4',None)
 			else:
 				os_family = "Linux"
 				# operation system info
@@ -242,7 +244,6 @@ def host(request,id):
 				# cron = json2html.convert(json = grains['cron'])
 
 				# grains = {'os':{},'software':{},'users':{},'hardware':{},'cron':{}}
-				factor = {}
 				factor['hostname'] = ret.get('nodename',None)
 				factor['os'] = ' '.join([ret.get('os',None),ret.get('osrelease',None)])
 				factor['kernel'] = ' '.join([ret.get('kernel',None),ret.get('kernelrelease',None)])

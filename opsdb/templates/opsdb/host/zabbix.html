@@ -39,7 +39,7 @@
               <ul class="breadcrumb">
                   <li><a href="#"></i>运维数据库</a></li>
                   <li><a href="{% url 'opsdb:hosts' %}"></i>主机</a></li>
-                  <li class="active">主机信息</li>
+                  <li class="active">{{id}}</li>
               </ul>
               <!--breadcrumbs end -->
           </div>
@@ -54,6 +54,9 @@
                         <li class="active">
                             <a href="{% url 'opsdb:zabbix' ip id %}" style="left: 15px;">监控</a>
                         </li>
+                        <li class="">
+                            <a href="" style="left: 15px;">告警</a>
+                        </li>
                     </ul>
                 </header>
                 <div class="panel-body">
@@ -61,7 +64,7 @@
                         <div class="col-xs-12 col-md-12 col-sm-12">
                             <form method="post" action="{% url 'opsdb:zabbix' ip id %}" id='zabbix'>
                                 {% csrf_token %}
-                                <div class="col-xs-8 col-md-6 col-sm-8">
+                                <div class="col-xs-6 col-md-6 col-sm-6">
                                     <label>时间范围:</label>
                                     <input type="text" id="dt_from" onclick="SetDate(this,'yyyy-MM-dd hh:mm:ss')" value="{{dt_from}}" name="dt_from" required>
                                     --
@@ -70,9 +73,9 @@
                                     
                                 </div>
 
-                                <div class="col-xs-4 col-md-6 col-sm-4">
-                                    <label>指标类型:</label>
-                                    <select onchange="submit()" name="graph" id="graphs">
+                                <div class="col-xs-6 col-md-6 col-sm-6">
+                                    <label class="col-xs-3 col-md-3 col-sm-3" style="width: 75px;margin-top: 3px;padding-right: 0px;">指标类型:</label>
+                                    <select class="col-xs-9 col-md-9 col-sm-9" onchange="submit()" name="graph" id="graphs">
                                         {% for name,graphid in graphs.items %}
                                             {% if name == graph_selected %}
                                             <option value="{{ name }}" selected>{{ name }}</option>
